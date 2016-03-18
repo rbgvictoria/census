@@ -4,3 +4,5 @@
 */cache/*
 !*/cache/index.html
 !*/cache/.htaccess
+/img/
+/js/OpenLayers-2.13.1/

@@ -1,0 +1,223 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+
+/* 
+    Created on : 18/04/2015, 11:46:15 AM
+    Author     : NKlaze
+*/
+
+body { 
+    overflow: hidden;
+    background-color: #41463f;
+}
+
+.navbar-offset { 
+    margin-top: 50px; 
+}
+
+#rbgv-branding {
+    background-color: #41463f;
+    border-bottom-color: #bb9d13;
+    border-bottom-width: 2px;
+}
+
+#rbgv-branding a.navbar-brand {
+    color: #d7bb44 !important;
+}
+
+#rbgv-branding img.rbgv-logo-navbar {
+    height: 35px;
+    margin-top: -7px;
+}
+
+a.navbar-brand:hover {
+    color: #ffffff !important;
+}
+
+#map { 
+    position: absolute; 
+    top: 50px; 
+    bottom: 0px; 
+    left: 0px; 
+    right: 0px; 
+}
+
+#map .ol-zoom { 
+    font-size: 1.2em; 
+}
+
+.ol-overlay-container {
+    position: absolute;
+    z-index: 90;
+}
+
+#popup {
+    position: relative;
+    z-index: 9999;
+    width: 400px;
+    background-color: #fff;
+    padding: 8px;
+    border-radius: 12px;
+}
+
+.popup-close {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  cursor: pointer;
+}
+
+.popup-close i {
+    background-color: #999;
+    border-color: #999;
+    border-width: 2px;
+    border-radius: 11px;
+    color: #fff;
+}
+
+.popup-content-item {
+    margin-bottom: 10px;
+}
+
+.popover {
+    max-width: 400px;
+}
+
+.popover-content {
+    width: 400px;
+    max-height: 300px;
+}
+
+.zoom-top-opened-sidebar { 
+    margin-top: 5px; 
+}
+
+.zoom-top-collapsed { 
+    margin-top: 45px; 
+}
+
+.mini-submenu{
+  display:none;  
+  background-color: rgba(255, 255, 255, 0.46);
+  border: 1px solid rgba(0, 0, 0, 0.9);
+  border-radius: 4px;
+  padding: 9px;  
+  /*position: relative;*/
+  width: 42px;
+  text-align: center;
+}
+
+.mini-submenu-left {
+  position: absolute;
+  top: 60px;
+  left: .5em;
+  z-index: 40;
+}
+.mini-submenu-right {
+  position: absolute;
+  top: 60px;
+  right: .5em;
+  z-index: 40;
+}
+
+#map { 
+    z-index: 35; 
+}
+
+.sidebar { 
+    z-index: 45; 
+}
+
+.main-row { 
+    position: relative; 
+    top: 0; 
+}
+
+.mini-submenu:hover {
+  cursor: pointer;
+}
+
+.slide-submenu {
+  background: #999;
+  display: inline-block;
+  height: 22px;
+  width: 22px;
+  position: absolute;
+  right: 21px;
+  top: 9px;
+  padding: 1px 3px 0 3px;
+  border-radius: 11px;
+  cursor: pointer;
+  border: solid 2px #999;
+}
+
+.slide-submenu i {
+    color: #fff;
+}
+
+.ol-mouse-position {
+  top: initial;
+  right: auto;
+  bottom: 10px;
+  left: 10px;
+  background-color: #000;
+  opacity: 0.8;
+  color: rgb(255, 255, 255);
+  padding: 5px 10px;
+  border-radius: 4px;
+}
+
+.social-media a[target=_blank] {
+    background-image: none;
+}
+
+.social-media>li>a {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.social-media>li:last-of-type>a {
+    margin-right: 10px;
+}
+
+.social-media span.icon {
+    display: inline-block;
+    height: 22px;
+    width: 22px;
+    background-image: url(http://www.rbg.vic.gov.au/common/img/sprite-icons.png);
+    background-color: rgb(65, 70, 63);
+    color: #fff;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+
+.social-media .icon-facebook-solid {
+    background-repeat: no-repeat;
+    background-position: -26px 5px;
+}
+
+.social-media .icon-facebook-solid:hover {
+    background-position: -108px 5px;
+}
+
+.social-media .icon-twitter-solid {
+    background-repeat: no-repeat;
+    background-position: 5px 4px;
+}
+
+.social-media .icon-twitter-solid:hover {
+    background-position: -77px 4px;
+}
+
+.social-media .icon-instagram-solid {
+    background-repeat: no-repeat;
+    background-position: -51px 4px;    
+}
+
+.social-media .icon-instagram-solid:hover {
+    background-position: -133px 4px;
+}
+

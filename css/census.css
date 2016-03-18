@@ -1,0 +1,172 @@
+/* 
+    Document   : census
+    Created on : Aug 10, 2014, 12:51:24 PM
+    Author     : Niels
+    Description:
+        Purpose of the stylesheet follows.
+*/
+
+#main {
+    margin-bottom: 1.25rem;
+}
+
+.result-table {
+    width: 100%;
+}
+
+.result-table.taxon {
+    width: auto;
+}
+
+.result-table a {
+    text-decoration: none;
+    color: inherit;
+}
+
+.result-table th {
+    text-align: left;
+    padding: 3px 5px;
+}
+
+.result-table td {
+    padding: 3px 5px;
+}
+
+td.table-taxon-header, td.table_bed_header {
+    padding-top: 12px;
+    padding-bottom: 3px;
+    border-bottom: solid 1px #cccccc;
+}
+
+td.table_bed_header a {
+    font-weight: bold;
+    color: #006600;
+}
+
+td.table-taxon-header div {
+    display: inline-block;
+}
+
+td.table-taxon-header div:nth-child(1) {
+    width: 79%;
+}
+
+td.table-taxon-header div:nth-child(2) {
+    width: 20%;
+    text-align: right;
+}
+
+.taxon-name {
+    color: #006600;
+    font-weight: bold;
+}
+
+.common-name {
+    font-weight: bold;
+    color: #999999;
+}
+
+.family {
+    font-weight: bold;
+    color: #006600;
+}
+
+.term {
+    margin: 0.3125rem 0;
+}
+
+.region-table td, .region-table th {
+    padding: 0.1875rem 0.3125rem;
+}
+
+.region-table th {
+    text-align: left;
+}
+
+.region-table a {
+    text-decoration: none;
+    color: #006600;
+}
+
+.region-table a:hover {
+    text-decoration: underline;
+}
+
+.numbers {
+    margin: 1rem 0 1rem 0;
+    padding: 0.3125rem;
+    width: auto;
+}
+
+/*
+* Format tabs
+*/
+
+#tabs.ui-widget, #tabs2.ui-widget {
+    font-family: inherit;
+    font-size: inherit;
+}
+
+#tabs.ui-widget-content, #tabs2.ui-widget-content {
+    border: none;
+}
+
+#tabs .ui-widget-header, #tabs2 .ui-widget-header {
+    border: none;
+    border-bottom: solid 0.0625rem #2f8a26;
+    background: none;
+}
+
+#tabs .ui-tabs-active, #tabs2 .ui-tabs-active {
+    border-color: #2f8a26;
+}
+
+#tabs ul.ui-corner-all, #tabs2 ul.ui-corner-all {
+    border-top-left-radius: 0;
+    border-bottom-left-radius: 0;
+    border-top-right-radius: 0;
+    border-bottom-right-radius: 0;
+}
+
+/*
+* Format map
+*/
+#map-frame {
+    width: 720px;
+    height: 720px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#map {
+    width: 720px;
+    height: 720px;
+}
+
+#map a[target="_blank"] {
+    background-image: none;
+}
+
+#mouse-position {
+    height: 1rem;
+}
+
+#map-frame2 {
+    width: 512px;
+    height: 400px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#map-world {
+    width: 512px;
+    height: 400px;
+}
+
+#map-world a[target="_blank"] {
+    background-image: none;
+}
+
+#mouse-position2 {
+    height: 1rem;
+}
