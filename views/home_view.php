@@ -1,7 +1,10 @@
 <?php require_once('header.php'); ?>
 
 <div class="container">
-<?=form_open('census/search', array('method' => 'get', 'class' => 'form-horizontal')); ?>
+<?=form_open('census/search', array(
+    'method' => 'get', 
+    'class' => 'form-horizontal'
+)); ?>
 
 <div class="form-group">
     <?=form_label('Location', 'search_location', array('class' => 'col-md-2 control-label')); ?>
@@ -54,7 +57,7 @@
 <div class="form-group">
     <?=form_label('Grid', 'search_grid', array('class' => 'col-md-2 control-label')); ?>
     <div class="col-md-4">
-        <?=form_dropdown('grid', array_merge(array('' => 'Select grid code...'), $gridcodes), FALSE, 'id="search_grid" class="form-control"');?>
+        <?=form_dropdown('grid', array_merge(array('' => ''), $gridcodes), FALSE, 'id="search_grid" class="form-control"');?>
     </div>
 </div>
 <?php endif; ?>
@@ -119,6 +122,13 @@
             <?php endif; ?>
             <option value="3">(3) Verified by botanist</option>
         </select>
+    </div>
+</div>
+    
+<div class="form-group">
+    <?=form_label('Order by', 'order_results', array('class' => 'col-md-2 control-label')); ?>
+    <div class="col-md-4">
+        <?=form_dropdown('order_results', array('taxon_name' => 'Species name', 'family' => 'Family', 'bed' => 'Bed'), FALSE, 'id="order_results" class="form-control"');?>
     </div>
 </div>
     

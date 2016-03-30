@@ -6,15 +6,21 @@ class CensusModel extends CI_Model {
         parent::__construct();
     }
     
-    public function getBeds($location=FALSE) {
-        $this->db->select('b.guid, b.bed_name');
+    public function getBeds($location=FALSE, $access_key=FALSE) {
+        $this->db->select("b.guid, CASE WHEN b.location='Cranbourne' AND b.bed_type='bed' 
+            THEN pb.bed_name || ': ' || b.bed_name ELSE b.bed_name END AS bed_name", FALSE);
         $this->db->from('rbgcensus.bed b');
         $this->db->join('rbgcensus.plant p', 'b.bed_id=p.bed_id');
+        $this->db->join('rbgcensus.bed pb', 'b.parent_id=pb.bed_id', 'left');
+        if (!$this->session->userdata('id') && !$access_key) {
+            $this->db->where('b.is_restricted !=', -1);
+        }
         if ($location) {
             $this->db->where('b.location', $location);
         }
         $this->db->group_by('b.bed_id');
-        $this->db->order_by('b.bed_name');
+        $this->db->group_by('pb.bed_id');
+        $this->db->order_by('bed_name');
         $query = $this->db->get();
         $ret = array();
         foreach ($query->result() as $row)
@@ -22,15 +28,21 @@ class CensusModel extends CI_Model {
         return $ret;
     }
     
-    public function getBedsJSON($location=FALSE) {
-        $this->db->select('b.guid, b.bed_name');
+    public function getBedsJSON($location=FALSE, $access_key=FALSE) {
+        $this->db->select("b.guid, CASE WHEN b.location='Cranbourne' AND b.bed_type='bed' 
+            THEN pb.bed_name || ': ' || b.bed_name ELSE b.bed_name END AS bed_name", FALSE);
         $this->db->from('rbgcensus.bed b');
         $this->db->join('rbgcensus.plant p', 'b.bed_id=p.bed_id');
+        $this->db->join('rbgcensus.bed pb', 'b.parent_id=pb.bed_id', 'left');
+        if (!$this->session->userdata('id') && !$access_key) {
+            $this->db->where('b.is_restricted !=', -1);
+        }
         if ($location) {
             $this->db->where('b.location', $location);
         }
         $this->db->group_by('b.bed_id');
-        $this->db->order_by('b.bed_name');
+        $this->db->group_by('pb.bed_id');
+        $this->db->order_by('bed_name');
         $query = $this->db->get();
         $ret = array();
         foreach ($query->result() as $row)
@@ -201,7 +213,7 @@ class CensusModel extends CI_Model {
         }
     }
     
-    public function findPlants($where, $limit=100, $offset=0, $inclDeaccessioned=FALSE) {
+    public function findPlants($where, $order='taxon_name', $limit=100, $offset=0, $inclDeaccessioned=FALSE) {
         $this->searchBaseQuery($where, $inclDeaccessioned);
         
         $this->db->select("t.guid as taxon_guid, t.taxon_name, c.family, t.common_name, b.guid as bed_guid, b.location, 
@@ -229,7 +241,21 @@ class CensusModel extends CI_Model {
             }
         }
         
-        $this->db->order_by('t.taxon_name, a.accession_number, p.plant_number');
+        switch ($order) {
+            case 'taxon_name':
+                $this->db->order_by('taxon_name');
+                break;
+            case 'family':
+                $this->db->order_by('family, taxon_name');
+                break;
+            case 'bed':
+                $this->db->order_by('bed_name, taxon_name');
+                break;
+            default:
+                break;
+        };
+        
+        $this->db->order_by('a.accession_number, p.plant_number');
         
         if ($limit)
             $this->db->limit($limit, $offset);
@@ -307,12 +333,18 @@ class CensusModel extends CI_Model {
         $this->db->join('rbgcensus.accession a', 't.taxon_id=a.taxon_id');
         $this->db->group_by('t.taxon_id');
         $this->db->group_by('c.genus_id');
-        if ($guid)
+        if ($guid) {
             $this->db->where('t.guid', $guid);
-        elseif ($taxonname)
+        }
+        elseif ($taxonname) {
             $this->db->where('t.taxon_name', $taxonname);
-        elseif ($accessionno)
+        }
+        elseif ($accessionno) {
             $this->db->where('a.accession_number', $accessionno);
+        }
+        if (!$this->session->userdata('id')) {
+            $this->db->where('t.no_public_display !=', 1);
+        }
         $query = $this->db->get();
         if ($query->num_rows())
             return $query->row_array();
@@ -334,6 +366,9 @@ class CensusModel extends CI_Model {
         $this->db->select('node_number');
         $this->db->from('rbgcensus.bed');
         $this->db->where('guid', $guid);
+        if (!$this->session->userdata('id')) {
+            $this->db->where('is_restricted !=', -1);
+        }
         $query = $this->db->get();
         if ($query->num_rows()) {
             $row = $query->row();
@@ -389,6 +424,9 @@ class CensusModel extends CI_Model {
         $this->db->join('rbgcensus.classification c', 't.genus_id=c.genus_id', 'left');
         $this->db->join('rbgcensus.accession a', 't.taxon_id=a.taxon_id');
         $this->db->where('a.guid', $guid);
+        if (!$this->session->userdata('id')) {
+            $this->db->where('t.no_public_display !=', 1);
+        }
         $query = $this->db->get();
         if ($query->num_rows())
             return $query->row_array();
@@ -433,6 +471,10 @@ class CensusModel extends CI_Model {
         $this->db->join('rbgcensus.bed b', 'p.bed_id=b.bed_id');
         $this->db->join('rbgcensus.grid g', 'p.grid_id=g.grid_id', 'left');
         $this->db->where('p.guid', $guid);
+        if (!$this->session->userdata('id')) {
+            $this->db->where('t.no_public_display !=', 1);
+            $this->db->where('b.is_restricted !=', -1);
+        }
         $query = $this->db->get();
         if ($query->num_rows())
             return $query->row_array();

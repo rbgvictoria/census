@@ -9,7 +9,8 @@ class Census extends CI_Controller {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->helper('form');
-        $this->output->enable_profiler(false);
+        $this->load->helper('versioning');
+        $this->output->enable_profiler(true);
         
         // Allow for custom style sheets and javascript
         $this->data['css'] = array();
@@ -45,13 +46,13 @@ class Census extends CI_Controller {
             
             if ($this->data['numbers']['num_plants'] > 0 ) {
                 if ($query->start > 0) {
-                    $plants = $this->censusmodel->findPlants($query->where, $query->rows+1, $query->start-1, $query->inclDeaccessioned);
+                    $plants = $this->censusmodel->findPlants($query->where, $query->sort, $query->rows+1, $query->start-1, $query->inclDeaccessioned);
                     $shift = array_shift($plants);
                     $this->data['plants'] = $plants;
                     $this->data['previous_taxon'] = $shift['taxon_name'];
                 } 
                 else {
-                    $this->data['plants'] = $this->censusmodel->findPlants($query->where, $query->rows, $query->start, $query->inclDeaccessioned);
+                    $this->data['plants'] = $this->censusmodel->findPlants($query->where, $query->sort, $query->rows, $query->start, $query->inclDeaccessioned);
                     $this->data['previous_taxon'] = FALSE;
                 }
                 $guids = array();
@@ -141,6 +142,9 @@ class Census extends CI_Controller {
     public function taxon($guid) {
         $this->data['page'] = 'taxon';
         $this->data['taxon'] = $this->censusmodel->getTaxon($guid);
+        if (!$this->data['taxon']) {
+            redirect('census');
+        }
         $this->data['numbers'] = $this->censusmodel->countPlants(array('taxon_guid' => $guid));
         $plants = $this->censusmodel->findPlants(array('taxon_guid' => $guid));
         $accessions = array();
@@ -185,6 +189,9 @@ class Census extends CI_Controller {
         $this->data['start'] = $start;
         $this->data['rows'] = $rows;
         $this->data['bed_info'] = $this->censusmodel->getBedInfo($guid);
+        if (!$this->data['bed_info']) {
+            redirect('census');
+        }
         if (isset($this->data['bed_info']['subprecinct']) && !isset($this->data['bed_info']['bed'])) {
             $this->data['beds'] = $this->censusmodel->getBedsSubprecinct($guid);
         }
@@ -246,6 +253,9 @@ class Census extends CI_Controller {
         $this->data['page'] = 'accession';
         $this->data['guid'] = $guid;
         $this->data['accession_info'] = $this->censusmodel->getAccessionInfo($guid);
+        if (!$this->data['accession_info']) {
+            redirect('census');
+        }
         $this->data['plant_info'] = $this->censusmodel->getPlantInfoByAccession($guid);
         $this->data['cql_filter'] = "accession_guid='$guid'";
         $this->load->view('detail_view', $this->data);
@@ -255,6 +265,9 @@ class Census extends CI_Controller {
         $this->data['page'] = 'plant';
         $this->data['guid'] = $guid;
         $this->data['plant_info'] = $this->censusmodel->getPlantInfo($guid);
+        if (!$this->data['plant_info']) {
+            redirect('census');
+        }
         $this->data['cql_filter'] = "plant_guid='$guid'";
         $this->load->view('detail_view', $this->data);
     }
@@ -391,8 +404,13 @@ class Census extends CI_Controller {
                 $cql[] = "identification_status='$terms[identification_status]'";
             }
         }
+        $order = 'taxon_name';
+        if (isset($terms['order_results']) && $terms['order_results']) {
+            $order = $terms['order_results'];
+        }
         return (object) array(
             'where' => $where,
+            'sort' => $order,
             'qstring' => $qstring,
             'cql' => $cql,
             'inclDeaccessioned' => $inclDeaccessioned,
