@@ -26,14 +26,18 @@
         <div class="container-fluid">
           <!-- Brand and toggle get grouped for better mobile display -->
           <div class="navbar-header">
-              <a class="navbar-brand" href="http://data.rbg.vic.gov.au/dev/rbgcensus/">
-                  <img src="http://data.rbg.vic.gov.au/dev/rbgcensus/css/images/rbg-vic-logo-transparent-34x25.png" 
+              <a class="navbar-brand" href="http://data.rbg.vic.gov.au/rbgcensus/">
+                  <img src="http://data.rbg.vic.gov.au/rbgcensus/css/images/rbg-vic-logo-transparent-34x25.png" 
                        alt="" 
                        class="rbgv-logo-navbar"
                   />
               </a>
-            <a class="navbar-brand" href="http://data.rbg.vic.gov.au/dev/rbgcensus/">Royal Botanic Gardens Victoria</a>
+            <a class="navbar-brand" href="http://data.rbg.vic.gov.au/rbgcensus/">Royal Botanic Gardens Victoria</a>
           </div>
+          <ul class="nav navbar-nav">
+            <li><a href="<?=site_url()?>">Search</a></li>
+            <li><a href="<?=site_url()?>explore">Explore</a></li>
+          </ul>
           <ul class="nav navbar-nav navbar-right social-media">
             <li><a href="https://twitter.com/RBG_Victoria" target="_blank"><span class="icon icon-twitter-solid"></span></a></li>
             <li><a href="https://www.facebook.com/BotanicGardensVictoria" target="_blank"><span class="icon icon-facebook-solid"></span></a></li>
@@ -61,27 +65,29 @@
               </div>
               <div id="layers" class="panel-collapse collapse in">
                 <div class="panel-body list-group">
+                    <?php if ($this->session->userdata('id')): ?>
                     <div class="h4">Overlays</div>
                     <div id="rbg-grid" class="list-group-item checkbox">
                       <label>
                         <input type="checkbox"> RBG grid
                       </label>
                     </div>
-                    <div id="rbg-map" class="list-group-item checkbox">
+                    <!--div id="rbg-map" class="list-group-item checkbox">
                       <label>
                         <input type="checkbox"> RBG map
                       </label>
-                    </div>
+                    </div-->
+                    <?php endif; ?>
                     <h4>Collections</h4>
                     <div id="commemorative" class="list-group-item checkbox">
                       <label>
-                        <input type="checkbox"> <img src="http://data.rbg.vic.gov.au/dev/rbgcensus/img/tree-icons/yellow_40/tree65_yellow_40.png"
+                        <input type="checkbox"> <img src="http://data.rbg.vic.gov.au/rbgcensus/img/tree-icons/yellow_40/tree65_yellow_40.png"
                                 alt="" height="20" width="20"/> Commemorative trees
                       </label>
                     </div>
                     <div id="national-trust" class="list-group-item checkbox">
                       <label>
-                          <input type="checkbox"> <img src="http://data.rbg.vic.gov.au/dev/rbgcensus/img/tree-icons/red_40/tree68_red_40.png"
+                          <input type="checkbox"> <img src="http://data.rbg.vic.gov.au/rbgcensus/img/tree-icons/red_40/tree68_red_40.png"
                                 alt="" height="20" width="20"/> National Trust listed trees
                       </label>
                     </div>

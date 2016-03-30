@@ -1,14 +1,3 @@
-<?php 
-    function hasGridCode($var) {
-        if ($var['grid_code']) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-?>
-
 <?php require_once('header.php'); ?>
 <div class="container">
 <h1>Search</h1>
@@ -81,7 +70,13 @@
     <a class="btn btn-default" href="<?=site_url();?>census/download_taxon_list?<?=$query_string?>">Download species list</a>
 </div>
 <?php 
-    $hasGridCode = array_filter($plants, 'hasGridCode'); 
+    $hasGridCode = FALSE;
+    foreach ($plants as $plant) {
+        if ($plant['grid_code']) {
+            $hasGridCode = TRUE;
+            break;
+        }
+    }
 
     if ($this->session->userdata('id')) {
         if (isset($plants[0]['deaccessioned'])) {
@@ -204,11 +199,21 @@
                 </div>
 
             </div> <!-- /#tab-list -->
-            <?php if(array_filter($plants, 'hasGridCode')): ?>
+            <?php if($hasGridCode): ?>
             <div id="tab-map" class="tab-pane active" >
                 <div id="map-frame">
                     <div id="map" class="map"></div>
                     <div id="mouse-position"></div>
+                    <div id="base-map-toggle" class="text-right">
+                        <div class="btn-group" data-toggle="buttons">
+                            <label class="btn btn-default active">
+                                <input type="radio" name="base-map-toggle" id="base-map-map" checked>Map
+                            </label>
+                            <label class="btn btn-default">
+                                <input type="radio" name="base-map-toggle" id="base-map-aerial">Aerial photo
+                            </label> 
+                        </div>
+                    </div>
                 </div>
             </div> <!-- /#tab-map -->
             <?php endif; ?>

@@ -11,7 +11,7 @@ class Ajax extends CI_Controller {
     }
     
     function bed() {
-        $data = $this->censusmodel->getBedsJSON($this->input->get('location'));
+        $data = $this->censusmodel->getBedsJSON($this->input->get('location'), $this->input->get('access_key'));
         $json = json_encode($data);
         header('Content-type: application/json');
         echo $json;

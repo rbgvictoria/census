@@ -1,14 +1,3 @@
-<?php 
-    function hasGridCode($var) {
-        if ($var['grid_code']) {
-            return true;
-        }
-        else {
-            return false;
-        }
-    }
-?>
-
 <?php require_once('header.php');?>
 
 <div class="container">
@@ -34,7 +23,7 @@
     <div class="term"><div class="col-md-2 field-label">Scientific name</div><div class="col-md-4"><?=formatName($taxon['taxon_name'])?> <?=$taxon['scientific_name_authorship']?></div></div>
     <div class="term"><div class="col-md-2 field-label">Common name</div><div class="col-md-4"><?=$taxon['common_name']?></div></div>
     <div class="term"><div class="col-md-2 field-label">Australian native</div><div class="col-md-4"><?=($taxon['isAutralianNative']) ? '&check;' : '&ndash;';?></div></div>
-    <div class="term"><div class="col-md-2 field-label">Endangered</div><div class="col-md-4"><?=($taxon['isEndangered']) ? '&ncheck;' : '&ndash;';?></div></div>
+    <div class="term"><div class="col-md-2 field-label">Endangered</div><div class="col-md-4"><?=($taxon['isEndangered']) ? '&check;' : '&ndash;';?></div></div>
 </div>
 
 <h4>Classification</h4>
@@ -57,6 +46,10 @@
     <?=anchor('http://www.ars-grin.gov/cgi-bin/npgs/html/tax_search.pl?' . urlencode($taxon['taxon_name']), 'GRIN', array('class' => 'btn btn-default')); ?>
     <?=anchor('http://www.google.com/search?q=' . urlencode($taxon['taxon_name']), 'Google', array('class' => 'btn btn-default')); ?>
     <?=anchor('http://images.google.com/images?hl=en&lr=&ie=ISO-8859-1&sa=N&tab=wi&q=' . urlencode($taxon['taxon_name']), 'Google Images', array('class' => 'btn btn-default')); ?>
+    <?php
+        $crit = str_replace("'", '', str_replace(' ', ' and ', $taxon['taxon_name']));
+    ?>
+    <?=anchor('http://apps.rhs.org.uk/horticulturaldatabase/summary2.asp?crit=' . urlencode($crit), 'RHS Database', array('class' => 'btn btn-default')); ?>
 </div>
 
 <?php elseif ($page == 'accession'): ?>
@@ -86,7 +79,24 @@
     <div class="term"><div class="col-md-2 field-label">Provenance type</div><div class="col-md-4"><?=$accession_info['provenance_type_code']?></div></div>
     <div class="term"><div class="col-md-2 field-label">Provenance</div><div class="col-md-4"><?=$accession_info['provenance_history']?></div></div>
     <div class="term"><div class="col-md-2 field-label">Collector</div><div class="col-md-4"><?=$accession_info['collector_name']?></div></div>
-    <div class="term"><div class="col-md-2 field-label">Identification status</div><div class="col-md-4"><?=$accession_info['identification_status']?></div></div>
+    <div class="term"><div class="col-md-2 field-label">Identification status</div><div class="col-md-4"><?=$accession_info['identification_status']?>
+        <?php 
+            $substr = substr($accession_info['identification_status'],0,1);
+            switch ($substr) {
+                case '1':
+                    echo ' (not verified)';
+                    break;
+                case '2':
+                    echo ' (verified by botanist, some uncertainty)';
+                    break;
+                case '3':
+                    echo ' (verified by botanist)';
+                    break;
+                default:
+                    break;
+            }
+        ?>
+    </div></div>
 </div>
 <?php elseif ($page == 'plant'): ?>
 <h3>Accession info.</h3>
@@ -95,7 +105,24 @@
     <div class="term"><div class="col-md-2 field-label">Provenance type</div><div class="col-md-4"><?=$plant_info['provenance_type_code']?></div></div>
     <div class="term"><div class="col-md-2 field-label">Provenance</div><div class="col-md-4"><?=$plant_info['provenance_history']?></div></div>
     <div class="term"><div class="col-md-2 field-label">Collector</div><div class="col-md-4"><?=$plant_info['collector_name']?></div></div>
-    <div class="term"><div class="col-md-2 field-label">Identification status</div><div class="col-md-4"><?=$plant_info['identification_status']?></div></div>
+    <div class="term"><div class="col-md-2 field-label">Identification status</div><div class="col-md-4"><?=$plant_info['identification_status']?>
+        <?php 
+            $substr = substr($plant_info['identification_status'],0,1);
+            switch ($substr) {
+                case '1':
+                    echo ' (not verified)';
+                    break;
+                case '2':
+                    echo ' (verified by botanist, some uncertainty)';
+                    break;
+                case '3':
+                    echo ' (verified by botanist)';
+                    break;
+                default:
+                    break;
+            }
+        ?>
+    </div></div>
 </div>
 <?php endif; ?>
 
@@ -120,6 +147,16 @@
         <div id="map-frame">
             <div id="map" class="map"></div>
             <div id="mouse-position"></div>
+            <div id="base-map-toggle" class="text-right">
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-default active">
+                        <input type="radio" name="base-map-toggle" id="base-map-map" checked>Map
+                    </label>
+                    <label class="btn btn-default">
+                        <input type="radio" name="base-map-toggle" id="base-map-aerial">Aerial photo
+                    </label> 
+                </div>
+            </div>
         </div>
     </div> <!-- #tab-map -->
     </div> <!-- /.tab-content -->
@@ -222,6 +259,16 @@
                     <div id="map-frame">
                         <div id="map" class="map"></div>
                         <div id="mouse-position"></div>
+                        <div id="base-map-toggle" class="text-right">
+                            <div class="btn-group" data-toggle="buttons">
+                                <label class="btn btn-default active">
+                                    <input type="radio" name="base-map-toggle" id="base-map-map" checked>Map
+                                </label>
+                                <label class="btn btn-default">
+                                    <input type="radio" name="base-map-toggle" id="base-map-aerial">Aerial photo
+                                </label> 
+                            </div>
+                        </div>
                     </div>
                 </div> <!-- /#tab-map -->
             </div> <!-- /.tab-content -->
@@ -231,7 +278,15 @@
 <?php endif; ?>
 
 <?php if ($page == 'taxon'): ?>
-<?php $hasGridCode = array_filter($plants, "hasGridCode"); ?>
+<?php 
+    $hasGridCode = FALSE;
+    foreach ($plants as $plant) {
+        if ($plant['grid_code']) {
+            $hasGridCode = TRUE;
+            break;
+        }
+    }
+?>
 <h3>In Royal Botanic Gardens Victoria</h3>
 <?php if ($numbers): ?>
 <div class="info-box info-box-stats">
@@ -300,6 +355,16 @@
             <div id="map-frame">
                 <div id="map" class="map"></div>
                 <div id="mouse-position"></div>
+                <div id="base-map-toggle" class="text-right">
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="base-map-toggle" id="base-map-map" checked>Map
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="radio" name="base-map-toggle" id="base-map-aerial">Aerial photo
+                        </label> 
+                    </div>
+                </div>
             </div>
         </div> <!-- /#tab-map -->
         <?php endif; ?>
@@ -391,10 +456,20 @@
 <?php endif; ?>
 
 <?php if ($plants): ?>
+<?php     
+    $hasGridCode = FALSE;
+    foreach ($plants as $plant) {
+        if ($plant['grid_code']) {
+            $hasGridCode = TRUE;
+            break;
+        }
+    }
+ ?>
+
 <div id="tabs" role="tabpanel">
     <ul class="nav nav-tabs" role="tablist">
         <li role="presentation"><a href="#tab-list" data-toggle="tab">Plant list</a></li>
-        <?php if ($bed_info['location'] == 'Melbourne'): ?>
+        <?php if ($hasGridCode): ?>
         <li role="presentation" class="active"><a href="#tab-map" data-toggle="tab">Map</a></li>
         <?php endif; ?>
     </ul>    
@@ -479,11 +554,21 @@
             </div>
         </div> <!-- /#tab-list -->
 
-        <?php if ($bed_info['location'] == 'Melbourne'): ?>
+        <?php if ($hasGridCode): ?>
         <div id="tab-map" class="tab-pane active">
             <div id="map-frame">
                 <div id="map" class="map"></div>
                 <div id="mouse-position"></div>
+                <div id="base-map-toggle" class="text-right">
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="base-map-toggle" id="base-map-map" checked>Map
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="radio" name="base-map-toggle" id="base-map-aerial">Aerial photo
+                        </label> 
+                    </div>
+                </div>
             </div>
         </div> <!-- /#tab-map -->
         <?php endif; ?>
@@ -571,6 +656,16 @@
             <div id="map-frame">
                 <div id="map" class="map"></div>
                 <div id="mouse-position"></div>
+                <div id="base-map-toggle" class="text-right">
+                    <div class="btn-group" data-toggle="buttons">
+                        <label class="btn btn-default active">
+                            <input type="radio" name="base-map-toggle" id="base-map-map" checked>Map
+                        </label>
+                        <label class="btn btn-default">
+                            <input type="radio" name="base-map-toggle" id="base-map-aerial">Aerial photo
+                        </label> 
+                    </div>
+                </div>
             </div>
         </div> <!-- /#tab-map -->
     </div> <!-- /.tab-content -->

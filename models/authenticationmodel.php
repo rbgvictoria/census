@@ -12,11 +12,13 @@ class AuthenticationModel extends CI_Model {
 		if($query->num_rows() > 0) {
 			$row = $query->row();
 			$session = array('id'=>$row->user_id,
-				'name'=>$row->user_name,
-				'firstname'=>$row->first_name,
-				'surname'=>$row->last_name,
-				'email'=>$row->email,
-				'role'=>$row->role);
+                            'name'=>$row->user_name,
+                            'firstname'=>$row->first_name,
+                            'surname'=>$row->last_name,
+                            'email'=>$row->email,
+                            'role'=>$row->role,
+                            'access_key'=>$row->access_key
+                        );
 			$this->session->set_userdata($session);
 			return true;
 		} else return false;

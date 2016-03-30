@@ -44,7 +44,21 @@ $(function() {
           },
           serverType: 'geoserver'
         }),
-        opacity: 1
+        opacity: 1,
+        visible: true
+    });
+
+    var rbgBase = new ol.layer.Tile({
+        title: "RBG aerial photo",
+        source: new ol.source.TileWMS({
+            url: 'http://data.rbg.vic.gov.au/geoserver/rbgcensus/wms',
+            params: {
+                LAYERS: 'rbgcensus:RBG_Melbourne',
+                VERSION: "1.1.0"
+            },
+            serverType: 'geoserver'
+        }),
+        visible: false
     });
 
     var occ = new ol.layer.Tile({
@@ -58,7 +72,8 @@ $(function() {
           },
           serverType: 'geoserver'
         }),
-        opacity: 1
+        opacity: 1,
+        visible: true
     });
 
     view = new ol.View({
@@ -85,7 +100,7 @@ $(function() {
     map = new ol.Map({
       target: 'map',
       //controls: ol.control.defaults().extend([mousePositionControl]),
-      layers: [rbgMap, occ],
+      layers: [rbgMap, rbgBase, occ],
       view: view
     });
     
@@ -140,5 +155,18 @@ $(function() {
     });
     
     $('#tabs2 a:first').tab('show');
+    
+    $('#base-map-toggle').on('click', '.btn', function(e) {
+        if (!$(e.target).hasClass('active')) {
+            if ($(e.target).children('input').eq(0).attr('id') === 'base-map-map') {
+                rbgMap.setVisible(true);
+                rbgBase.setVisible(false);
+            }
+            else {
+                rbgBase.setVisible(true);
+                rbgMap.setVisible(false);
+            }
+        }
+    });
 
 });

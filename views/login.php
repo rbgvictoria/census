@@ -5,7 +5,7 @@
         <div class="form-group">
             <?=form_label('Username', 'username', array('class' => 'col-sm-2 control-label')); ?>
             <div class="col-sm-4">
-                <?=form_input(array('name'=>'username', 'id'=>'username', 'class' => 'form-control', 'placeholder' => 'Username')); ?>
+                <?=form_input(array('name'=>'username', 'id'=>'username', 'class' => 'form-control', 'value' => 'rbgcensus')); ?>
             </div>
         </div>
     

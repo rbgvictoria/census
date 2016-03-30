@@ -20,7 +20,8 @@ class Admin extends CI_Controller {
         $this->load->helper('url');
         $this->load->helper('form');
         $this->load->helper('captcha');
-        $this->output->enable_profiler(false);
+        $this->load->helper('versioning');
+        //$this->output->enable_profiler(false);
         $this->load->model('authenticationmodel');
     }
 
@@ -54,7 +55,7 @@ class Admin extends CI_Controller {
 
     function logout(){
         // unset the session variables, then destroy the session
-        $unset = array('id'=>'', 'name'=>'', 'firstname'=>'', 'surname'=>'', 'email'=>'', 'role'=>'');
+        $unset = array('id'=>'', 'name'=>'', 'firstname'=>'', 'surname'=>'', 'email'=>'', 'role'=>'', 'access_key'=>'');
         $this->session->unset_userdata($unset);
         //$this->session->sess_destroy();
         if (isset($_SERVER['HTTP_REFERER']) && substr($_SERVER['HTTP_REFERER'], 0, strlen(base_url())) == base_url()) 

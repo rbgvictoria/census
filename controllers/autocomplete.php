@@ -13,24 +13,24 @@ class AutoComplete extends CI_Controller {
         $this->load->model('autocompletemodel');
     }
     
-    function autocomplete_taxonname() {
+    function autocomplete_taxonname($access_key=FALSE) {
         if (empty($_GET['term'])) exit;
         $q = strtolower($_GET['term']);
-        $items = $this->autocompletemodel->getTaxa($q);
+        $items = $this->autocompletemodel->getTaxa($q, $access_key);
         echo json_encode($items);
     }
     
-    function autocomplete_family() {
+    function autocomplete_family($access_key=FALSE) {
         if (empty($_GET['term'])) exit;
         $q = strtolower($_GET['term']);
-        $items = $this->autocompletemodel->getFamilies($q);
+        $items = $this->autocompletemodel->getFamilies($q, $access_key);
         echo json_encode($items);
     }
     
-    function autocomplete_common_name() {
+    function autocomplete_common_name($access_key=FALSE) {
         if (empty($_GET['term'])) exit;
         $q = strtolower($_GET['term']);
-        $items = $this->autocompletemodel->getCommonNames($q);
+        $items = $this->autocompletemodel->getCommonNames($q, $access_key);
         echo json_encode($items);
     }
     

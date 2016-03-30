@@ -21,8 +21,8 @@
     <link rel="stylesheet" href="http://openlayers.org/en/v3.4.0/css/ol.css" type="text/css">
     <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/jqueryui.autocomplete.css" />
-    <link rel="stylesheet" type="text/css" href="<?=base_url()?>css/main.css" />
+    <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/jqueryui.autocomplete.css');?>" />
+    <link rel="stylesheet" type="text/css" href="<?=base_url()?><?=autoVersion('css/main.css')?>" />
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
     <script src="http://cdnjs.cloudflare.com/ajax/libs/proj4js/2.2.1/proj4.js" type="text/javascript"></script>
@@ -31,10 +31,9 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
     <!--script src="//ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/jquery-ui.min.js"></script-->
     <script src="<?=base_url()?>js/jquery-ui-1.11.4-autocomplete.min.js"></script>
-    <script src="<?=base_url()?>js/jquery.rbgcensus.js"></script>
-    <script src="<?=base_url()?>js/jquery.rbgcensus.ol3.js"></script>
+    <script src="<?=base_url()?><?=autoVersion('js/jquery.rbgcensus.js')?>"></script>
+    <script src="<?=base_url()?><?=autoVersion('js/jquery.rbgcensus.ol3.js')?>"></script>
     <?php if (isset($cql_filter)): ?>
-    <!--script src="<?=base_url()?>js/jquery.rbgcensus.ol3.js"></script-->
     <script type="text/javascript">
         var cql_filter = "<?=$cql_filter?>";
     </script>
@@ -52,7 +51,7 @@
         <!-- Brand and toggle get grouped for better mobile display -->
         <div class="navbar-header">
             <a class="navbar-brand" href="http://www.rbg.vic.gov.au">
-                <img src="http://data.rbg.vic.gov.au/dev/rbgcensus/css/images/rbg-vic-logo-transparent-48x35.png" 
+                <img src="<?=base_url()?>css/images/rbg-vic-logo-transparent-48x35.png" 
                      alt="" 
                      class="rbgv-logo-navbar"
                 />
@@ -84,11 +83,15 @@
             <li><a href="<?=site_url()?>">Search</a></li>
             <li><a href="<?=site_url()?>explore">Explore</a></li>
           </ul>
-          <?=form_open('census/search', array('method' => 'get', 'class' => 'navbar-form navbar-right')); ?>
+          <?=form_open('census/search', array('method' => 'get', 'class' => 'navbar-form navbar-right', 'data-restricted-access-key' => $this->session->userdata('access_key'))); ?>
             <div class="form-group">
-              <?=form_input(array('name' => 'q', 'class' => 'form-control', 'placeholder' => 'Enter taxon name...')); ?>
+                <?=form_input(array(
+                    'name' => 'q', 
+                    'class' => 'form-control', 
+                    'placeholder' => 'Enter species name...'
+                )); ?>
             </div>
-            <input type="submit" class="btn btn-default" value="Find"/>
+            <button type="submit" class="btn btn-default"><i class="fa fa-search fa-lg"></i></button>
           <?=form_close(); ?>
         </div><!--/.navbar-collapse -->
           </div><!--/.row -->
