@@ -20,6 +20,13 @@ class AutoComplete extends CI_Controller {
         echo json_encode($items);
     }
     
+    function autocomplete_taxonname_explore() {
+        if (empty($_GET['term'])) exit;
+        $q = strtolower($_GET['term']);
+        $items = $this->autocompletemodel->getTaxaForExplore($q);
+        echo json_encode($items);
+    }
+    
     function autocomplete_family($access_key=FALSE) {
         if (empty($_GET['term'])) exit;
         $q = strtolower($_GET['term']);

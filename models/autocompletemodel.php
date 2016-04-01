@@ -68,6 +68,26 @@ class AutoCompleteModel extends CI_Model {
         }
     }
     
+    public function getTaxaForExplore($q) {
+        $this->db->select('t.guid, t.taxon_name');
+        $this->db->from('rbgcensus.taxon t');
+        $this->db->join('rbgcensus.accession a', 't.taxon_id=a.taxon_id');
+        $this->db->join('rbgcensus.plant p', 'a.accession_id=p.accession_id');
+        $this->db->join('rbgcensus.bed b', 'p.bed_id=b.bed_id');
+        $this->db->like("lower(t.taxon_name)", $q, 'after');
+        $this->db->where('t.accepted_names IS NULL', FALSE, FALSE);
+        $this->db->where('(t.no_public_display IS NULL OR t.no_public_display=0)', FALSE, FALSE);
+        $this->db->where('(b.is_restricted IS NULL OR b.is_restricted=0)', FALSE, FALSE);
+        $this->db->join('rbgcensus.deaccession d', 'p.plant_id=d.plant_id', 'left');
+        $this->db->where('d.deaccession_id IS NULL', FALSE, FALSE);
+        $this->db->where('b.location', 'Melbourne');
+        $this->db->group_by('t.taxon_id');
+        $this->db->order_by('taxon_name');
+
+        $query = $this->db->get();
+        return $query->result();
+    }
+
     public function getFamilies($q, $inclDeaccessioned=FALSE) {
         $this->db->select('c.family');
         $this->db->from('rbgcensus.taxon t');

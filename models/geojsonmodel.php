@@ -62,6 +62,7 @@ class geoJSONModel extends CI_Model {
         }
         
         $query = $this->db->get();
+        echo $this->db->last_query();
         return $query->result();
     }
     
@@ -92,6 +93,21 @@ class geoJSONModel extends CI_Model {
             }
             return $result;
         }
+    }
+    
+    public function getSpeciesCentroidsAmg($guid) {
+        $this->db->select("p.guid as plant_id, a.accession_number, p.plant_number, 
+            t.guid as taxon_id, t.taxon_name, g.code as grid_code, b.bed_name, b.guid as bed_id,
+            ST_AsGeoJSON(ST_Transform(ST_Centroid(g.geom), '28355'), 7, 4) AS geometry", FALSE);
+        $this->db->from('rbgcensus.plant p');
+        $this->db->join('rbgcensus.accession a', 'p.accession_id=a.accession_id');
+        $this->db->join('rbgcensus.taxon t', 'a.taxon_id=t.taxon_id');
+        $this->db->join('rbgcensus.grid g', 'p.grid_id=g.grid_id');
+        $this->db->join('rbgcensus.bed b', 'p.bed_id=b.bed_id');
+        $this->db->where('b.location', 'Melbourne');
+        $this->db->where('t.guid', $guid);
+        $query = $this->db->get();
+        return $query->result();
     }
     
     /*

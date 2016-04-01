@@ -10,7 +10,7 @@ class Census extends CI_Controller {
         $this->load->helper('url');
         $this->load->helper('form');
         $this->load->helper('versioning');
-        $this->output->enable_profiler(true);
+        $this->output->enable_profiler(false);
         
         // Allow for custom style sheets and javascript
         $this->data['css'] = array();
@@ -18,6 +18,7 @@ class Census extends CI_Controller {
         $this->data['iehack'] = FALSE;
         
         $this->load->model('censusmodel');
+        $this->data['date_last_modified'] = $this->censusmodel->getLastModifiedDate();
     }
 
     public function index() {
@@ -164,6 +165,12 @@ class Census extends CI_Controller {
         $this->data['regions'] = $this->censusmodel->getWGSRegions($guid);
         
         $this->load->view('detail_view', $this->data);
+    }
+    
+    public function species_detail($species_id) {
+        $guid = $this->censusmodel->remapSpeciesID($species_id);
+        $this->session->set_flashdata('redirect_url', site_url() . 'index.php/census/species_detail/' . $species_id);
+        header("Location: " . site_url() . 'census/taxon/' .$guid );
     }
     
     public function bed($guid) {
@@ -419,6 +426,21 @@ class Census extends CI_Controller {
         );
     } 
     
+}
+
+if (!function_exists('http_response_code'))
+{
+    function http_response_code($newcode = NULL)
+    {
+        static $code = 200;
+        if($newcode !== NULL)
+        {
+            header('X-PHP-Response-Code: '.$newcode, true, $newcode);
+            if(!headers_sent())
+                $code = $newcode;
+        }       
+        return $code;
+    }
 }
 
 /* End of file census.php */

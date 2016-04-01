@@ -221,3 +221,7 @@ a.navbar-brand:hover {
     background-position: -133px 4px;
 }
 
+.rbgcensus-explore-autocomplete-list {
+    padding-left: 15px;
+    padding-right: 15px;
+}

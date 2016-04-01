@@ -356,3 +356,11 @@ td.table_bed_header .all a {
     top: 10px;
     right: 0;
 }
+
+.redirect {
+    color: #999;
+}
+
+.last-updated {
+    margin-top: 31px;
+}

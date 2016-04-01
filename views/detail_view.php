@@ -2,19 +2,22 @@
 
 <div class="container">
 <?php if ($page == 'taxon'): ?>
-<h1><?=formatName($taxon['taxon_name']); ?></h1>
+    <?php if ($this->session->flashdata('redirect_url')): ?>
+    <div class="redirect">Redirected from: <?=$this->session->flashdata('redirect_url')?></div>
+    <?php endif; ?>
+    <h1><?=formatName($taxon['taxon_name']); ?></h1>
 <?php elseif ($page == 'accession'): ?>
-<h1><?=$accession_info['accession_number']?></h1>
+    <h1><?=$accession_info['accession_number']?></h1>
 <?php elseif ($page == 'plant'): ?>
-<h1><?=$plant_info['accession_number']?>.<?=$plant_info['plant_number']?></h1>
+    <h1><?=$plant_info['accession_number']?>.<?=$plant_info['plant_number']?></h1>
 <?php elseif ($page == 'bed'): ?>
 <?php 
     $types = array_keys($bed_info);
     $key = $types[count($types)-1];
 ?>
-<h1><?=$bed_info[$key]['name']?></h1>
+    <h1><?=$bed_info[$key]['name']?></h1>
 <?php elseif ($page == 'grid'): ?>
-<h1>Grid: <?=$grid_info['code']?></h1>
+    <h1>Grid: <?=$grid_info['code']?></h1>
 <?php endif; ?>
 
 <?php if ($page == 'taxon'): ?>

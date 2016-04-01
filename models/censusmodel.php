@@ -6,6 +6,12 @@ class CensusModel extends CI_Model {
         parent::__construct();
     }
     
+    public function getLastModifiedDate() {
+        $query = $this->db->query("SELECT max(timestamp_modified) as timestamp_last_modified FROM rbgcensus.plant");
+        $row = $query->row();
+        return $row->timestamp_last_modified;
+    }
+    
     public function getBeds($location=FALSE, $access_key=FALSE) {
         $this->db->select("b.guid, CASE WHEN b.location='Cranbourne' AND b.bed_type='bed' 
             THEN pb.bed_name || ': ' || b.bed_name ELSE b.bed_name END AS bed_name", FALSE);
@@ -350,6 +356,20 @@ class CensusModel extends CI_Model {
             return $query->row_array();
         else
             return FALSE;
+    }
+    
+    public function remapSpeciesID($speciesId) {
+        $this->db->select('guid');
+        $this->db->from('rbgcensus.taxon');
+        $this->db->where('species_id', $speciesId);
+        $query = $this->db->get();
+        if ($query->num_rows()) {
+            $row = $query->row();
+            return $row->guid;
+        }
+        else {
+            return FALSE;
+        }
     }
     
     public function getAcceptedNames($where, $inclDeaccessioned=FALSE) {

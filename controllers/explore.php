@@ -7,6 +7,7 @@ class Explore extends CI_Controller {
         $this->load->library('session');
         $this->load->helper('url');
         $this->load->helper('form');
+        $this->load->helper('versioning');
     }
     
     function index() {

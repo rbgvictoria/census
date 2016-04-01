@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-var base_url = 'http://data.rbg.vic.gov.au/dev/rbgcensus';
+var base_url = location.href.substring(0, location.href.indexOf('rbgcensus') + 9);
 
 var map;
 var view;
@@ -120,6 +120,7 @@ $(function() {
         format: new ol.format.GeoJSON(),
         loader: function() {
             var url = base_url + '/geojson/collection/1';
+            console.log(url);
             $.ajax({
                 url: url,
                 success: function(data) {
@@ -136,7 +137,7 @@ $(function() {
         anchorXUnits: 'fraction',
         anchorYUnits: 'pixels',
         opacity: 1,
-        src: base_url + '/img/tree-icons/yellow_40/tree65_yellow_40.png'
+        src: 'img/tree-icons/yellow_40/tree65_yellow_40.png'
       }))
     });
     
@@ -159,7 +160,7 @@ $(function() {
     natSource = new ol.source.ServerVector({
         format: new ol.format.GeoJSON(),
         loader: function() {
-            var url = base_url + '/geojson/collection/2';
+            var url = 'http://data.rbg.vic.gov.au/rbgcensus/geojson/collection/2';
             $.ajax({
                 url: url,
                 success: function(data) {
@@ -176,7 +177,7 @@ $(function() {
         anchorXUnits: 'fraction',
         anchorYUnits: 'pixels',
         opacity: 1,
-        src: base_url + '/img/tree-icons/red_40/tree68_red_40.png'
+        src: 'http://data.rbg.vic.gov.au/rbgcensus/img/tree-icons/red_40/tree68_red_40.png'
       }))
     });
     
@@ -274,8 +275,8 @@ $(function() {
                   trees.push('<h4>Commemorative trees</h4>');
                     $.each(items, function(index, item){
                         var tree = '<div class="popup-content-item">';
-                        tree += '<div><a href="' + base_url + '/census/plant/' + item.plant_guid + '" target="_blank"><b>' + item.plant_number + '</b></a></div>';
-                        tree += '<div><a href="' + base_url + '/census/taxon/' + item.taxon_guid + '" target="_blank"><i>' + item.taxon_name + '</i></a></div>';
+                        tree += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/plant/' + item.plant_guid + '" target="_blank"><b>' + item.plant_number + '</b></a></div>';
+                        tree += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/taxon/' + item.taxon_guid + '" target="_blank"><i>' + item.taxon_name + '</i></a></div>';
                         if (item.attributes.commemorative !== undefined) {
                             tree += '<div><b>Commemorative:</b> ' + item.attributes.commemorative + '</div>';
                         }
@@ -296,8 +297,8 @@ $(function() {
                     trees.push('<h4>National Trust</h4>');
                     $.each(items, function(index, item){
                         var tree = '<div class="popup-content-item">';
-                        tree += '<div><a href="' + base_url + '/census/plant/' + item.plant_guid + '" target="_blank"><b>' + item.plant_number + '</b></a></div>';
-                        tree += '<div><a href="' + base_url + '/census/taxon/' + item.taxon_guid + '" target="_blank"><i>' + item.taxon_name + '</i></a></div>';
+                        tree += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/plant/' + item.plant_guid + '" target="_blank"><b>' + item.plant_number + '</b></a></div>';
+                        tree += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/taxon/' + item.taxon_guid + '" target="_blank"><i>' + item.taxon_name + '</i></a></div>';
                         if (item.attributes.national_trust_status !== undefined) {
                             tree += '<div><b>Status:</b> ' + item.attributes.national_trust_status + '</div>';
                         }
@@ -385,7 +386,3 @@ function applyInitialUIState() {
         $('.mini-submenu-right').fadeIn();
     }
 }
-
-
-
-

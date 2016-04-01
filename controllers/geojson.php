@@ -69,8 +69,8 @@ class GeoJSON extends CI_Controller {
         if ($where) {
             $this->createGeoJSON($this->geojsonmodel->getGridCells($where));
         }
-        
     }
+    
     function bed($uuid) {
         $terms = array();
         $terms['bed_guid'] = $uuid;
@@ -94,7 +94,12 @@ class GeoJSON extends CI_Controller {
             $feature['type'] = 'Feature';
             $feature['geometry'] = json_decode($row->geometry);
             
-            $properties = (isset($row->properties)) ? $row->properties : array('code' => $row->code);
+            if (isset($row->code)) {
+                $properties = (isset($row->properties)) ? $row->properties : array('code' => $row->code);
+            }
+            else {
+                $properties = $row->properties;
+            }
             
             $feature['properties'] = (object) $properties;
             $features[] = (object) $feature;
@@ -144,7 +149,27 @@ class GeoJSON extends CI_Controller {
             $featuredata[] = (object) $feature;
         }
         $this->createGeoJSON($featuredata, '28355');
+    }    
+    
+    function species($uuid) {
+        $data = $this->geojsonmodel->getSpeciesCentroidsAmg($uuid);
+        $featuredata = array();
+        foreach ($data as $row) {
+            $feature = new stdClass();
+            $feature->geometry = $row->geometry;
+            $props = new stdClass();
+            $props->plant_number = $row->accession_number . '.' . $row->plant_number;
+            $props->plant_id = $row->plant_id;
+            $props->taxon_name = $row->taxon_name;
+            $props->taxon_id = $row->taxon_id;
+            $props->bed_name = $row->bed_name;
+            $props->bed_id = $row->bed_id;
+            $feature->properties = $props;
+            $featuredata[] = $feature;
+        }
+        $this->createGeoJSON($featuredata, '28355');
     }
+
     
     
     
