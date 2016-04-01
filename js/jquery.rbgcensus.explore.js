@@ -120,10 +120,9 @@ $(function() {
         }
     })
     
-    
+    var geoJsonFormat = new ol.format.GeoJSON();
     // Commemorative trees
-    commSource = new ol.source.ServerVector({
-        format: new ol.format.GeoJSON(),
+    commSource = new ol.source.Vector({
         loader: function() {
             var url = base_url + '/geojson/collection/1';
             console.log(url);
@@ -131,7 +130,7 @@ $(function() {
                 url: url,
                 success: function(data) {
                     commGeoJSON = data;
-                    commSource.addFeatures(commSource.readFeatures(data));
+                    commSource.addFeatures(geoJsonFormat.readFeatures(data));
                 }
             });
         }
@@ -163,15 +162,14 @@ $(function() {
     })
     
     // National Trust listed
-    natSource = new ol.source.ServerVector({
-        format: new ol.format.GeoJSON(),
+    natSource = new ol.source.Vector({
         loader: function() {
             var url = 'http://data.rbg.vic.gov.au/rbgcensus/geojson/collection/2';
             $.ajax({
                 url: url,
                 success: function(data) {
                     natGeoJSON = data;
-                    natSource.addFeatures(natSource.readFeatures(data));
+                    natSource.addFeatures(geoJsonFormat.readFeatures(data));
                 }
             });
         }
@@ -375,23 +373,27 @@ var autocompleteSpeciesName = function() {
 };
 
 var getSpeciesLayer = function(guid) {
+    var format = new ol.format.GeoJSON();
     var url = base_url + '/geojson/species/' + guid;
-    var source = new ol.source.ServerVector({
-        format: new ol.format.GeoJSON(),
+    var source = new ol.source.Vector({
         loader: function() {
             $.ajax({
                 url: url,
                 success: function(data) {
                     speciesGeoJSON.push(data);
-                    source.addFeatures(commSource.readFeatures(data));
+                    source.addFeatures(format.readFeatures(data));
                 }
             });
         }
     });
     
+    var r = Math.round(Math.random()*255);
+    var g = Math.round(Math.random()*255);
+    var b = Math.round(Math.random()*255);
+    
     var iconStyle = new ol.style.Style({
         image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-          color: [113, 140, 0, 1],
+          color: [r, g, b, 1],
           src: 'img/icons/dot.png'
         }))
       });
