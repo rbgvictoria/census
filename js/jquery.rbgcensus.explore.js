@@ -13,7 +13,13 @@ var natSource;
 var commGeoJSON;
 var natGeoJSON;
 
+var speciesLayers = [];
+var speciesGeoJSON = [];
+
 $(function() {
+    // auto-complete for name search
+    autocompleteSpeciesName();
+    
     $('.sidebar-left .slide-submenu').on('click',function() {
         var thisEl = $(this);
         thisEl.closest('.sidebar-body').fadeOut('slide',function(){
@@ -346,6 +352,59 @@ $(function() {
     
     applyMargins();
 });
+
+var autocompleteSpeciesName = function() {
+    $('input#taxon-name').autocomplete({
+        source: base_url + '/autocomplete/autocomplete_taxonname_explore',
+        minLength: 2,
+        focus: function( event, ui ) {
+            $( "#taxon-name" ).val( ui.item.taxon_name );
+            return false;
+        },
+        select: function( event, ui ) {
+            $( "#taxon-id" ).val( ui.item.guid );
+            $( "#taxon-name" ).val( ui.item.taxon_name );
+            getSpeciesLayer(ui.item.guid);
+            return false;
+        }
+    })
+    .autocomplete("instance")._renderItem = function(ul, item) {
+        ul.addClass('rbgcensus-explore-autocomplete-list');
+        return $( "<li>", {html: item.taxon_name} ).appendTo( ul );
+    };
+};
+
+var getSpeciesLayer = function(guid) {
+    var url = base_url + '/geojson/species/' + guid;
+    var source = new ol.source.ServerVector({
+        format: new ol.format.GeoJSON(),
+        loader: function() {
+            $.ajax({
+                url: url,
+                success: function(data) {
+                    speciesGeoJSON.push(data);
+                    source.addFeatures(commSource.readFeatures(data));
+                }
+            });
+        }
+    });
+    
+    var iconStyle = new ol.style.Style({
+        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+          color: [113, 140, 0, 1],
+          src: 'img/icons/dot.png'
+        }))
+      });
+    
+    var layer = new ol.layer.Vector({
+      source: source,
+      style: iconStyle
+    });
+    var i = speciesLayers.length;  
+    speciesLayers.push(layer);
+    
+    map.addLayer(speciesLayers[i]);
+};
 
 function applyMargins() {
     var leftToggler = $(".mini-submenu-left");
