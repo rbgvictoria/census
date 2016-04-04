@@ -36,7 +36,7 @@
           </div>
           <ul class="nav navbar-nav">
             <li><a href="<?=site_url()?>">Search</a></li>
-            <li><a href="<?=site_url()?>explore">Explore</a></li>
+            <li><a href="<?=site_url()?>explore">Explore Melbourne Gardens</a></li>
           </ul>
           <ul class="nav navbar-nav navbar-right social-media">
             <li><a href="https://twitter.com/RBG_Victoria" target="_blank"><span class="icon icon-twitter-solid"></span></a></li>
@@ -93,32 +93,6 @@
                 </div>
               </div>
             </div>
-            <!--div class="panel panel-default">
-              <div class="panel-heading">
-                <h4 class="panel-title">
-                  <a data-toggle="collapse" href="#properties">
-                    <i class="fa fa-list-alt"></i>
-                    Properties
-                  </a>
-                </h4>
-              </div>
-              <div id="properties" class="panel-collapse collapse in">
-                <div class="panel-body">
-                  <p>
-                  Lorem ipsum dolor sit amet, vel an wisi propriae. Sea ut graece gloriatur. Per ei quando dicant vivendum. An insolens appellantur eos, doctus convenire vis et, at solet aeterno intellegebat qui.
-                  </p>
-                  <p>
-                  Elitr minimum inciderint qui no. Ne mea quaerendum scriptorem consequuntur. Mel ea nobis discere dignissim, aperiam patrioque ei ius. Stet laboramus eos te, his recteque mnesarchum an, quo id adipisci salutatus. Quas solet inimicus eu per. Sonet conclusionemque id vis.
-                  </p>
-                  <p>
-                  Eam vivendo repudiandae in, ei pri sint probatus. Pri et lorem praesent periculis, dicam singulis ut sed. Omnis patrioque sit ei, vis illud impetus molestiae id. Ex viderer assentior mel, inani liber officiis pro et. Qui ut perfecto repudiandae, per no hinc tation labores.
-                  </p>
-                  <p>
-                  Pro cu scaevola antiopam, cum id inermis salutatus. No duo liber gloriatur. Duo id vitae decore, justo consequat vix et. Sea id tale quot vitae.
-                  </p>
-                </div>
-              </div>
-            </div-->
           </div>
         </div>
         <div class="col-sm-4 col-md-6 mid"></div>
@@ -138,18 +112,6 @@
               </div>
               <div id="taskpane" class="panel-collapse collapse in">
                 <div class="panel-body">
-                  <p>
-                  Lorem ipsum dolor sit amet, vel an wisi propriae. Sea ut graece gloriatur. Per ei quando dicant vivendum. An insolens appellantur eos, doctus convenire vis et, at solet aeterno intellegebat qui.
-                  </p>
-                  <p>
-                  Elitr minimum inciderint qui no. Ne mea quaerendum scriptorem consequuntur. Mel ea nobis discere dignissim, aperiam patrioque ei ius. Stet laboramus eos te, his recteque mnesarchum an, quo id adipisci salutatus. Quas solet inimicus eu per. Sonet conclusionemque id vis.
-                  </p>
-                  <p>
-                  Eam vivendo repudiandae in, ei pri sint probatus. Pri et lorem praesent periculis, dicam singulis ut sed. Omnis patrioque sit ei, vis illud impetus molestiae id. Ex viderer assentior mel, inani liber officiis pro et. Qui ut perfecto repudiandae, per no hinc tation labores.
-                  </p>
-                  <p>
-                  Pro cu scaevola antiopam, cum id inermis salutatus. No duo liber gloriatur. Duo id vitae decore, justo consequat vix et. Sea id tale quot vitae.
-                  </p>
                 </div>
               </div>
             </div>
@@ -162,6 +124,17 @@
       <div class="mini-submenu mini-submenu-right pull-right">
         <i class="fa fa-tasks"></i>
       </div>
+
+      <div id="base-map-toggle" class="text-right">
+        <div class="btn-group" data-toggle="buttons">
+            <label class="btn btn-default">
+                <input type="radio" name="base-map-toggle" id="base-map-map" checked>Map
+            </label>
+            <label class="btn btn-default active">
+                <input type="radio" name="base-map-toggle" id="base-map-aerial">Aerial photo
+            </label> 
+        </div>
     </div>
+
   </body>
 </html>

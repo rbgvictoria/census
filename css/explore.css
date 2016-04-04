@@ -54,41 +54,55 @@ a.navbar-brand:hover {
     z-index: 90;
 }
 
-#popup {
-    position: relative;
-    z-index: 9999;
-    width: 400px;
-    background-color: #fff;
-    padding: 8px;
-    border-radius: 12px;
-}
-
-.popup-close {
-  position: absolute;
-  top: 2px;
-  right: 2px;
-  cursor: pointer;
-}
-
-.popup-close i {
-    background-color: #999;
-    border-color: #999;
-    border-width: 2px;
-    border-radius: 11px;
-    color: #fff;
-}
-
-.popup-content-item {
-    margin-bottom: 10px;
-}
-
 .popover {
-    max-width: 400px;
+    max-width: 320px;
+    width: 320px;
+    height: 180px;
+    z-index: 999;
+}
+
+.popover .feature {
+    display: none;
+}
+
+.popover-title {
+    height: 30px;
+    background-color: transparent;
+    border-bottom: none;
 }
 
 .popover-content {
-    width: 400px;
-    max-height: 300px;
+    height: 106px;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.popover-footer {
+    height: 30px;
+    margin: 0 15px;
+}
+
+.features {
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.popover.collection .features {
+    min-height: 219px;
+}
+
+.popover::after {
+    display: block;
+    content: "";
+}
+
+.popover .feature:first-child {
+    display: block;
+}
+
+.popover .feature-nav div:first-child {
+    padding-top: 6px;
+    font-weight: bold;
 }
 
 .zoom-top-opened-sidebar { 
@@ -116,6 +130,7 @@ a.navbar-brand:hover {
   left: .5em;
   z-index: 40;
 }
+
 .mini-submenu-right {
   position: absolute;
   top: 60px;
@@ -224,8 +239,8 @@ a.navbar-brand:hover {
 .rbgcensus-explore-autocomplete-list {
     padding-left: 15px;
     padding-right: 15px;
+    cursor: pointer;
 }
-
 
 #species-layers div {
     position: relative;
@@ -245,4 +260,17 @@ a.navbar-brand:hover {
     cursor: pointer;
     display: inline-block;
     margin-left: 10px;
+}
+
+#base-map-toggle {
+    position: absolute;
+    top: 70px;
+    right: 10px;
+    z-index: 999;
+}
+
+.modal-body {
+    /* 100% = dialog height, 120px = header + footer */
+    max-height: calc(100% - 120px);
+    overflow-y: auto;
 }
