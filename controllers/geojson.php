@@ -134,14 +134,41 @@ class GeoJSON extends CI_Controller {
             $feature['geometry'] = $row['geometry'];
             $properties = array();
             $properties['taxon_name'] = $row['taxon_name'];
-            $properties['taxon_guid'] = $row['taxon_guid'];
+            $properties['taxon_id'] = $row['taxon_id'];
             $properties['plant_number'] = $row['accession_number'] . '.' . $row['plant_number'];
-            $properties['plant_guid'] = $row['plant_guid'];
+            $properties['plant_id'] = $row['plant_id'];
+            $properties['bed_id'] = $row['bed_id'];
+            $properties['bed_name'] = $row['bed_name'];
             $properties['grid_code'] = $row['grid_code'];
+            if (isset($row['collection'])) {
+                $properties['collection'] = $row['collection']; 
+            }
             if ($row['attr_label']) {
                 $attributes = array();
                 foreach ($row['attr_label'] as $index => $value) {
-                    $attributes[$value] = $row['attr_value'][$index]; 
+                    switch ($value) {
+                        case 'commemorative':
+                            if ($collection || $collection == 1) {
+                                $attributes[$value] = $row['attr_value'][$index];
+                            }
+                            break;
+
+                        case 'national_trust_status':
+                        case 'national_trust_significance':
+                            if ($collection || $collection == 2) {
+                                $attributes[$value] = $row['attr_value'][$index];
+                            }
+                            break;
+                            
+                        case 'date_planted':
+                            $attributes[$value] = date('j F Y', strtotime($row['attr_value'][$index]));
+                            break;
+
+                        default:
+                                $attributes[$value] = $row['attr_value'][$index];
+                            break;
+                    }
+                     
                 }
                 $properties['attributes'] = (object) $attributes;
             }

@@ -225,3 +225,24 @@ a.navbar-brand:hover {
     padding-left: 15px;
     padding-right: 15px;
 }
+
+
+#species-layers div {
+    position: relative;
+}
+
+#species-layers div .delete-layer, 
+#collection-layers div .delete-layer {
+    position: absolute;
+    right: 15px;
+    top: 10px;
+    color: #999;
+    cursor: pointer;
+}
+
+#species-layers .attribute-table {
+    color: #999;
+    cursor: pointer;
+    display: inline-block;
+    margin-left: 10px;
+}

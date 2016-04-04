@@ -79,21 +79,17 @@
                     </div-->
                     <?php endif; ?>
                     <h4>Collections</h4>
-                    <div id="commemorative" class="list-group-item checkbox">
-                      <label>
-                        <input type="checkbox"> <img src="http://data.rbg.vic.gov.au/rbgcensus/img/tree-icons/yellow_40/tree65_yellow_40.png"
-                                alt="" height="20" width="20"/> Commemorative trees
-                      </label>
-                    </div>
-                    <div id="national-trust" class="list-group-item checkbox">
-                      <label>
-                          <input type="checkbox"> <img src="http://data.rbg.vic.gov.au/rbgcensus/img/tree-icons/red_40/tree68_red_40.png"
-                                alt="" height="20" width="20"/> National Trust listed trees
-                      </label>
-                    </div>
+                    <select id="collection" class="form-control">
+                        <option></option>
+                        <option value="1">Commemorative trees</option>
+                        <option value="2">National Trust listed trees</option>
+                    </select>
+                    <div id="collection-layers"></div>;
+                    
                     <h4>Species</h4>
                     <input type="text" id="taxon-name" class="form-control"/>
                     <input type="hidden" id="taxon-id"/>
+                    <div id="species-layers"></div>
                 </div>
               </div>
             </div>
@@ -167,4 +163,5 @@
         <i class="fa fa-tasks"></i>
       </div>
     </div>
-  </body></html>
+  </body>
+</html>

@@ -67,22 +67,24 @@ class geoJSONModel extends CI_Model {
     }
     
     public function getCollectionCentroidsAmg($collection=FALSE) {
-        $this->db->select("c.name as collection, a.accession_number, p.plant_number, 
-                p.guid AS plant_guid, t.taxon_name, t.guid as taxon_guid,
+        $this->db->select("c.name as collection, a.accession_number, p.guid AS plant_id, p.plant_number, 
+                t.taxon_name, t.guid as taxon_id, g.code as grid_code, b.bed_name, b.guid as bed_id,
                 array_agg(att.name ORDER BY att.attribute_id) as attr_label, 
                 array_agg(pa.value ORDER BY att.attribute_id) as attr_value,
-                g.code as grid_code, ST_AsGeoJSON(ST_Transform(ST_Centroid(g.geom), '28355')) AS geometry", FALSE);
+                ST_AsGeoJSON(ST_Transform(ST_Centroid(g.geom), '28355'), 7, 4) AS geometry", FALSE);
         $this->db->from('rbgcensus.plant p');
         $this->db->join('rbgcensus.collection_plant cp', 'p.plant_id=cp.plant_id');
         $this->db->join('rbgcensus.collection c', 'cp.collection_id=c.collection_id');
         $this->db->join('rbgcensus.accession a', 'p.accession_id=a.accession_id');
         $this->db->join('rbgcensus.taxon t', 'a.taxon_id=t.taxon_id');
         $this->db->join('rbgcensus.grid g', 'p.grid_id=g.grid_id');
+        $this->db->join('rbgcensus.bed b', 'p.bed_id=b.bed_id');
         $this->db->join('rbgcensus.plantattr pa', 'p.plant_id=pa.plant_id', 'left');
         $this->db->join('rbgcensus.attribute att', 'pa.attribute_id=att.attribute_id', 'left');
-        if ($collection)
+        if ($collection) {
             $this->db->where('c.collection_id', $collection);
-        $this->db->group_by('c.collection_id, p.plant_id, a.accession_id, t.taxon_id, g.grid_id');
+        }
+        $this->db->group_by('c.collection_id, p.plant_id, a.accession_id, t.taxon_id, b.bed_id, g.grid_id');
         
         $query = $this->db->get();
         if ($query->num_rows()) {

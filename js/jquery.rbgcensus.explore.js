@@ -13,13 +13,10 @@ var natSource;
 var commGeoJSON;
 var natGeoJSON;
 
+var collectionLayers = [];
 var speciesLayers = [];
-var speciesGeoJSON = [];
 
 $(function() {
-    // auto-complete for name search
-    autocompleteSpeciesName();
-    
     $('.sidebar-left .slide-submenu').on('click',function() {
         var thisEl = $(this);
         thisEl.closest('.sidebar-body').fadeOut('slide',function(){
@@ -57,6 +54,17 @@ $(function() {
     
     $(window).on("resize", applyMargins);
     
+    initMap();
+    mapInteraction();
+    getCollectionLayers();
+    getSpeciesLayers();
+    toggleLayerOnOff();
+    removeLayer();
+    
+    applyMargins();
+});
+
+var initMap = function() {
     var projection = new ol.proj.Projection({
         code: 'EPSG:28355',
         extent: [321679.9999999997,5810629.999999995,322719.9999999997,5811729.999999995]
@@ -120,86 +128,6 @@ $(function() {
         }
     })
     
-    var geoJsonFormat = new ol.format.GeoJSON();
-    // Commemorative trees
-    commSource = new ol.source.Vector({
-        loader: function() {
-            var url = base_url + '/geojson/collection/1';
-            console.log(url);
-            $.ajax({
-                url: url,
-                success: function(data) {
-                    commGeoJSON = data;
-                    commSource.addFeatures(geoJsonFormat.readFeatures(data));
-                }
-            });
-        }
-    });
-    
-    var iconStyleCT = new ol.style.Style({
-      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-        anchor: [0.5, 40],
-        anchorXUnits: 'fraction',
-        anchorYUnits: 'pixels',
-        opacity: 1,
-        src: 'img/tree-icons/yellow_40/tree65_yellow_40.png'
-      }))
-    });
-    
-    commemorativeTrees = new ol.layer.Vector({
-      source: commSource,
-      style: iconStyleCT
-    });
-
-    $('#commemorative :checkbox').removeAttr('checked');
-    $('#commemorative').on('click', 'input[type=checkbox]', function() {
-        if ($(this).prop('checked')) {
-            map.addLayer(commemorativeTrees);
-        }
-        else {
-            map.removeLayer(commemorativeTrees);
-        }
-    })
-    
-    // National Trust listed
-    natSource = new ol.source.Vector({
-        loader: function() {
-            var url = 'http://data.rbg.vic.gov.au/rbgcensus/geojson/collection/2';
-            $.ajax({
-                url: url,
-                success: function(data) {
-                    natGeoJSON = data;
-                    natSource.addFeatures(geoJsonFormat.readFeatures(data));
-                }
-            });
-        }
-    });
-    
-    var iconStyle = new ol.style.Style({
-      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-        anchor: [0.5, 40],
-        anchorXUnits: 'fraction',
-        anchorYUnits: 'pixels',
-        opacity: 1,
-        src: 'http://data.rbg.vic.gov.au/rbgcensus/img/tree-icons/red_40/tree68_red_40.png'
-      }))
-    });
-    
-    nationalTrust = new ol.layer.Vector({
-      source: natSource,
-      style: iconStyle
-    });
-
-    $('#national-trust :checkbox').removeAttr('checked');
-    $('#national-trust').on('click', 'input[type=checkbox]', function() {
-        if ($(this).prop('checked')) {
-            map.addLayer(nationalTrust);
-        }
-        else {
-            map.removeLayer(nationalTrust);
-        }
-    })
-    
     view = new ol.View({
         projection: projection,
         center: [322200, 5811180],
@@ -253,11 +181,22 @@ $(function() {
             jTarget.css("cursor", "");
         }
     });
-    
+};
+
+var mapInteraction = function() {
     map.on('click', function(evt) {
-        var element = $('<div>', {
+        
+        /*
+         * The JQuery element gives an error in the new version of OpenLayers,
+         * so we use the native Javascript way to create the element
+         * @type @exp;document@call;createElement
+         */
+        var element = document.createElement('div');
+        $(element).attr('id','popup');
+
+        /*var element = $('<div>', {
             'id': 'popup'
-        });
+        });*/
 
         var popup = new ol.Overlay({
           element: element,
@@ -266,58 +205,16 @@ $(function() {
         });
         map.addOverlay(popup);
         
-        var feature = map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-            //console.log(feature.getProperties().grid_code);
-            return feature;
+        var features = [];
+        map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+            features.push(feature);
         });
-        if (feature) {
-            var grid_code = feature.getProperties().grid_code;
-            var trees = [];
-            if ($('#commemorative :checkbox').prop('checked')) {
-                var items = JSPath('..properties{.grid_code == "' + grid_code + '"}', commGeoJSON);
-                if (items.length) {
-                  trees.push('<h4>Commemorative trees</h4>');
-                    $.each(items, function(index, item){
-                        var tree = '<div class="popup-content-item">';
-                        tree += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/plant/' + item.plant_guid + '" target="_blank"><b>' + item.plant_number + '</b></a></div>';
-                        tree += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/taxon/' + item.taxon_guid + '" target="_blank"><i>' + item.taxon_name + '</i></a></div>';
-                        if (item.attributes.commemorative !== undefined) {
-                            tree += '<div><b>Commemorative:</b> ' + item.attributes.commemorative + '</div>';
-                        }
-                        if (item.attributes.in_memory_of !== undefined) {
-                            tree += '<div><b>In memory of:</b> ' + item.attributes.in_memory_of + '</div>';
-                        }
-                        if (item.attributes.date_planted !== undefined) {
-                            tree += '<div><b>Date planted:</b> ' + item.attributes.date_planted + '</div>';
-                        }
-                        tree += '</div>';
-                        trees.push(tree);
-                    });
-                }
-            }
-            if ($('#national-trust :checkbox').prop('checked')) {
-                var items = JSPath('..properties{.grid_code == "' + grid_code + '"}', natGeoJSON);
-                if (items.length) {
-                    trees.push('<h4>National Trust</h4>');
-                    $.each(items, function(index, item){
-                        var tree = '<div class="popup-content-item">';
-                        tree += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/plant/' + item.plant_guid + '" target="_blank"><b>' + item.plant_number + '</b></a></div>';
-                        tree += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/taxon/' + item.taxon_guid + '" target="_blank"><i>' + item.taxon_name + '</i></a></div>';
-                        if (item.attributes.national_trust_status !== undefined) {
-                            tree += '<div><b>Status:</b> ' + item.attributes.national_trust_status + '</div>';
-                        }
-                        if (item.attributes.national_trust_significance !== undefined) {
-                            tree += '<div><b>Significance:</b> ' + item.attributes.national_trust_significance + '</div>';
-                        }
-                        tree += '</div>';
-                        trees.push(tree);
-                    });
-                }
-            }
-            var content = trees.join('');
+        
+        if (features.length) {
+            var content = infoWindowContent(features);
             
             
-          var geometry = feature.getGeometry();
+          var geometry = features[0].getGeometry();
           var coord = geometry.getCoordinates();
           popup.setPosition(coord);
           /*$(element).popover({
@@ -347,11 +244,132 @@ $(function() {
     $('#map').on('click', '.popup-close', function(e) {
         $(this).parent().detach();
     });
-    
-    applyMargins();
-});
+};
 
-var autocompleteSpeciesName = function() {
+var infoWindowContent = function(features) {
+    var html = [];
+    html.push('<div class="features">');
+    $.each(features, function(index, feature) {
+        html.push(infoWindowContentFeature(feature));
+    });
+    html.push('</div>');
+    
+    if (features.length > 1) {
+        html.push('<div class="feature-nav row">');
+        html.push('<div class="col-sm-6">')
+        html.push('1 of ' + features.length);
+        html.push('</div>');
+        
+        html.push('<div class="col-sm-6 text-right">');
+        html.push('<button class="prev btn btn-default btn-sm" disabled="disabled"><i class="fa fa-chevron-left"></i> prev</span>');
+        html.push('<button class="next btn btn-default btn-sm">next <i class="fa fa-chevron-right"></i></button>');
+        html.push('</div>');
+        html.push('</div>');
+    }
+    
+    return html.join('');
+};
+
+var infoWindowContentFeature = function(feature) {
+    var properties = feature.getProperties();
+    var html = '<div class="feature">';
+    html += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/plant/' + properties.plant_id + '" target="_blank"><b>' + properties.plant_number + '</b></a></div>';
+    html += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/taxon/' + properties.taxon_id + '" target="_blank"><i>' + properties.taxon_name + '</i></a></div>';
+    html += '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/bed/' + properties.bed_id + '" target="_blank"><i>' + properties.bed_name + '</i></a></div>';
+    //html += '<div>&nbsp;</div>';
+    
+    /*if (properties.attributes !== undefined && properties.attributes) {
+        html += '<div><span class="feature-info" data-toggle="modal" data-target="#featureInfoModal" ' + 
+                'data-plant-id="' + properties.plant_id + '" ' + 
+                'data-layer-group="' + properties.layerProperties.layerGroup + '" ' + 
+                'data-layer-index="' + properties.layerProperties.layerIndex + '"><i class="fa fa-info-circle"></i></span></div>';
+    }*/
+    html += '</div>';
+    return html;
+};
+
+var getCollectionLayers = function() {
+    $('#collection').on('change', function() {
+        var collection = $(this).val();
+        if (collection) {
+            var colls = [];
+            $('#collection-layers>div').each(function() {
+                colls.push($(this).data('collection-id'));
+            });
+            var i = colls.indexOf(Number(collection));
+            if (i === -1) {
+                getCollectionLayer(collection);
+            }
+            else {
+                $('#collection-layers>div').eq(i).prependTo('#collection-layers');
+            }
+        }
+    });
+};
+
+var getCollectionLayer = function(collection) {
+    var format = new ol.format.GeoJSON();
+    var url = base_url + '/geojson/collection/' + collection;
+    var source = new ol.source.Vector({
+        loader: function() {
+            $.ajax({
+                url: url,
+                success: function(data) {
+                   source.addFeatures(format.readFeatures(data));
+                }
+            });
+        }
+    });
+    
+    var r = Math.round(Math.random()*255);
+    var g = Math.round(Math.random()*255);
+    var b = Math.round(Math.random()*255);
+    
+    var layerProps = {
+        1: {
+            "icon" : "tree-icons/yellow_40/tree65_yellow_40.png",
+            "name" : "Commemorative trees"
+        },
+        2: {
+            "icon" : "tree-icons/red_40/tree68_red_40.png",
+            "name" : "National Trust listed trees"
+        }
+    };
+    
+    var iconStyle = new ol.style.Style({
+      image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
+        anchor: [0.5, 40],
+        anchorXUnits: 'fraction',
+        anchorYUnits: 'pixels',
+        opacity: 1,
+        src: 'img/' + layerProps[collection].icon
+      }))
+    });
+    
+    var layer = new ol.layer.Vector({
+      source: source,
+      style: iconStyle
+    });
+    
+    var i = collectionLayers.length;  
+    layer.setProperties({
+        "layerGroup": "collection",
+        "layerIndex": i
+    });
+    collectionLayers.push(layer);
+    
+    map.addLayer(collectionLayers[i]);
+    
+    $('<div>', {
+        'class': 'list-group-item checkbox',
+        'html' : '<label><input type="checkbox" data-collection-layer-index="' + i + '" checked="checked"/>' + 
+                '<img src="img/' + layerProps[collection].icon + '" alt="" height="20" width="20"/> ' +
+                layerProps[collection].name + ' <span class="delete-layer"><i class="fa fa-trash-o"></i></span></l abel>',
+        'data-collection-id': collection
+    }).prependTo('#collection-layers');
+};
+
+var getSpeciesLayers = function() {
     $('input#taxon-name').autocomplete({
         source: base_url + '/autocomplete/autocomplete_taxonname_explore',
         minLength: 2,
@@ -362,7 +380,18 @@ var autocompleteSpeciesName = function() {
         select: function( event, ui ) {
             $( "#taxon-id" ).val( ui.item.guid );
             $( "#taxon-name" ).val( ui.item.taxon_name );
-            getSpeciesLayer(ui.item.guid);
+            
+            var guids = [];
+            $('#species-layers>div').each(function() {
+                guids.push($(this).data('taxon-id'));
+            });
+            var i = guids.indexOf(ui.item.guid);
+            if (i === -1) {
+                getSpeciesLayer(ui.item.guid);
+            }
+            else {
+                $('#species-layers>div').eq(i).prependTo('#species-layers');
+            }
             return false;
         }
     })
@@ -380,7 +409,6 @@ var getSpeciesLayer = function(guid) {
             $.ajax({
                 url: url,
                 success: function(data) {
-                    speciesGeoJSON.push(data);
                     source.addFeatures(format.readFeatures(data));
                 }
             });
@@ -391,21 +419,103 @@ var getSpeciesLayer = function(guid) {
     var g = Math.round(Math.random()*255);
     var b = Math.round(Math.random()*255);
     
+    var fill = new ol.style.Fill({
+        color: [r,g,b,1.0]
+    });
+    
+    var fillText = 'rgba(' + r + ',' + g + ',' + b + ', 1.0)';
+    
+    var stroke = new ol.style.Stroke({
+        color: '#000',
+        width: 1.25
+    });
+    
     var iconStyle = new ol.style.Style({
-        image: new ol.style.Icon(/** @type {olx.style.IconOptions} */ ({
-          color: [r, g, b, 1],
-          src: 'img/icons/dot.png'
-        }))
-      });
+        image: new ol.style.Circle({
+            fill: fill,
+            stroke: stroke,
+            radius: 8
+        }),
+        fill: fill,
+        stroke: stroke
+    });
     
     var layer = new ol.layer.Vector({
       source: source,
       style: iconStyle
     });
     var i = speciesLayers.length;  
+    layer.setProperties({
+        "layerGroup": "species",
+        "layerIndex": i
+    });
     speciesLayers.push(layer);
     
     map.addLayer(speciesLayers[i]);
+    
+    var circle = '<svg height="16" width="16">' +
+            '<circle cx="8" cy="10" r="6" stroke="black" stroke-width="1" fill="' + fillText + '" />' +
+        '</svg>';
+
+    var triangle = '<svg height="16" width="16">' +
+        '<polygon points="2,16 8,4 14,16" style="fill:' + fillText + ';stroke:black;stroke-width:1" />' +
+        '</svg>';
+
+    $('<div>', {
+        'class': 'list-group-item checkbox',
+        'html' : '<label><input type="checkbox" data-species-layer-index="' + i + '" checked="checked"/>' + 
+                '<span class="icon">' + circle + '</span> ' + 
+                $('#taxon-name').val() + '</label>' +  
+                '<span class="attribute-table" data-toggle="modal" data-target="#attributeTableModal"><i class="fa fa-table"></i></span>' + 
+                ' <span class="delete-layer"><i class="fa fa-trash-o"></i></span>',
+        'data-taxon-id': guid
+    }).prependTo('#species-layers');
+};
+
+var toggleLayerOnOff = function() {
+    $('#species-layers').on('click', ':checkbox', function() {
+        var index = Number($(this).attr('data-species-layer-index'));
+        if ($(this).prop('checked')) {
+            map.addLayer(speciesLayers[index]);
+        }
+        else {
+            map.removeLayer(speciesLayers[index]);
+        }
+    });
+    
+    $('#collection-layers').on('click', ':checkbox', function() {
+        var index = Number($(this).attr('data-collection-layer-index'));
+        if ($(this).prop('checked')) {
+            map.addLayer(collectionLayers[index]);
+        }
+        else {
+            map.removeLayer(collectionLayers[index]);
+        }
+    });
+};
+
+var removeLayer = function() {
+    $('#species-layers').on('click', '.delete-layer', function() {
+        var parentDiv = $(this).parents('div').eq(0);
+        var checked = parentDiv.find(':checkbox').eq(0).prop('checked');
+        var index = Number(parentDiv.find(':checkbox').eq(0).attr('data-species-layer-index'));
+        if (checked) {
+            map.removeLayer(speciesLayers[index]);
+        }
+        speciesLayers[index] = {};
+        parentDiv.remove();
+    });
+    
+    $('#collection-layers').on('click', '.delete-layer', function() {
+        var parentDiv = $(this).parents('div').eq(0);
+        var checked = parentDiv.find(':checkbox').eq(0).prop('checked');
+        var index = Number(parentDiv.find(':checkbox').eq(0).attr('data-collection-layer-index'));
+        if (checked) {
+            map.removeLayer(collectionLayers[index]);
+        }
+        collectionLayers[index] = {};
+        parentDiv.remove();
+    });
 };
 
 function applyMargins() {
