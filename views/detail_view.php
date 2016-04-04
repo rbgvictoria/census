@@ -533,8 +533,8 @@
                     <tr>
                         <td><a href="<?=site_url()?>census/accession/<?=$plants[$index]['accession_guid']?>"><?=$plants[$index]['accession_number']?></a></td>
                         <td><a href="<?=site_url()?>census/plant/<?=$plants[$index]['plant_guid']?>"><?=$plants[$index]['plant_number']?></a></td>
-                        <td class="text-center"><a href="<?=site_url()?>census/plant/<?=$plants[$index]['provenance_type_code']?>"><?=$plants[$index]['plant_number']?></a></td>
-                        <td class="text-center"><a href="<?=site_url()?>census/plant/<?=$plants[$index]['identification_status']?>"><?=$plants[$index]['plant_number']?></a></td>
+                        <td class="text-center"><?=$plants[$index]['provenance_type_code']?></td>
+                        <td class="text-center"><?=$plants[$index]['identification_status']?></td>
                         
                         <?php if ($this->session->userdata('id')): ?>
                         <td class="text-center"><input type="checkbox"<?=($plants[$index]['restricted']) ? ' checked="checked"' : '';?>/></td>

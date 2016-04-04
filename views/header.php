@@ -81,7 +81,7 @@
           <ul class="nav navbar-nav">
             <li><a href="<?=site_url()?>"><span class="glyphicon glyphicon-home"></a></li>
             <li><a href="<?=site_url()?>">Search</a></li>
-            <li><a href="<?=site_url()?>explore">Explore</a></li>
+            <li><a href="<?=site_url()?>explore">Explore Melbourne Gardens</a></li>
           </ul>
           <?=form_open('census/search', array('method' => 'get', 'class' => 'navbar-form navbar-right', 'data-restricted-access-key' => $this->session->userdata('access_key'))); ?>
             <div class="form-group">

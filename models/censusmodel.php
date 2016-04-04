@@ -258,6 +258,7 @@ class CensusModel extends CI_Model {
                 $this->db->order_by('bed_name, taxon_name');
                 break;
             default:
+                $this->db->order_by('taxon_name');
                 break;
         };
         

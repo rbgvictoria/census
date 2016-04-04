@@ -204,13 +204,13 @@ class Census extends CI_Controller {
         }
         $this->data['numbers'] = $this->censusmodel->countPlants(array('bed_guid' => $guid));
         if ($start > 0) {
-            $plants = $this->censusmodel->findPlants(array('bed_guid' => $guid), $rows+1, $start-1);
+            $plants = $this->censusmodel->findPlants(array('bed_guid' => $guid), 'taxon_name', $rows+1, $start-1);
             $shift = array_shift($plants);
             $this->data['plants'] = $plants;
             $this->data['previous_taxon'] = $shift['taxon_name'];
         }
         else {
-            $this->data['plants'] = $this->censusmodel->findPlants(array('bed_guid' => $guid), $rows, $start);
+            $this->data['plants'] = $this->censusmodel->findPlants(array('bed_guid' => $guid),  'taxon_name', $rows, $start);
             $this->data['previous_taxon'] = FALSE;
         }
         $this->data['cql_filter'] = "bed_guid='$guid'";
@@ -243,13 +243,13 @@ class Census extends CI_Controller {
         $this->data['grid_info'] = $this->censusmodel->getGridInfo($guid);
         $this->data['numbers'] = $this->censusmodel->countPlants(array('grid_guid' => $guid));
         if ($start > 0) {
-            $plants = $this->censusmodel->findPlants(array('grid_guid' => $guid), $rows+1, $start-1);
+            $plants = $this->censusmodel->findPlants(array('grid_guid' => $guid), 'taxon_name', $rows+1, $start-1);
             $shift = array_shift($plants);
             $this->data['plants'] = $plants;
             $this->data['previous_taxon'] = $shift['taxon_name'];
         }
         else {
-            $this->data['plants'] = $this->censusmodel->findPlants(array('grid_guid' => $guid), $rows, $start);
+            $this->data['plants'] = $this->censusmodel->findPlants(array('grid_guid' => $guid),  'taxon_name', $rows, $start);
             $this->data['previous_taxon'] = FALSE;
         }
         $this->data['cql_filter'] = "grid_guid='$guid'";
