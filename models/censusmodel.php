@@ -214,13 +214,13 @@ class CensusModel extends CI_Model {
         if ($where) {
             foreach ($where as $key => $value) {
                 if ($key == 'taxon')
-                    $this->db->like('t.taxon_name', $value, 'after');
+                    $this->db->where("lower(t.taxon_name) LIKE '" . strtolower($value) . "%'", FALSE, FALSE);
                 if ($key == 'taxon_guid')
                     $this->db->where('t.guid', $value);
                 if ($key == 'common_name')
-                    $this->db->where("t.common_name LIKE '$value'", FALSE, FALSE);
+                    $this->db->where("lower(t.common_name) LIKE '" . strtolower($value) . "'", FALSE, FALSE);
                 if ($key == 'family')
-                    $this->db->where('c.family', $value);
+                    $this->db->where('lower(c.family)', strtolower($value), FALSE);
                 if ($key == 'grid')
                     $this->db->where('g.code', $value);
                 if ($key == 'grid_guid')
