@@ -255,6 +255,7 @@ a.navbar-brand:hover {
     cursor: pointer;
 }
 
+#collection-layers .attribute-table,
 #species-layers .attribute-table {
     color: #999;
     cursor: pointer;

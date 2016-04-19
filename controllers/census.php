@@ -10,7 +10,7 @@ class Census extends CI_Controller {
         $this->load->helper('url');
         $this->load->helper('form');
         $this->load->helper('versioning');
-        $this->output->enable_profiler(false);
+        $this->output->enable_profiler(TRUE);
         
         // Allow for custom style sheets and javascript
         $this->data['css'] = array();
@@ -24,6 +24,7 @@ class Census extends CI_Controller {
     public function index() {
         $this->data['beds'] = $this->censusmodel->getBeds();
         $this->data['precincts'] = $this->censusmodel->getPrecincts();
+        $this->data['subprecincts'] = $this->censusmodel->getSubprecincts();
         $this->data['gridcodes'] = $this->censusmodel->getGridCodes();
         $this->load->view('home_view', $this->data);
     }
@@ -337,6 +338,12 @@ class Census extends CI_Controller {
             $where['precinct'] = $t;
             $qstring[] = 'precinct=' . $terms['precinct'];
             $cql[] = "precinct='$t'";
+        }
+        if (isset($terms['subprecinct']) && $terms['subprecinct']) {
+            $t = urldecode($terms['subprecinct']);
+            $where['subprecinct'] = $t;
+            $qstring[] = 'subprecinct=' . $terms['subprecinct'];
+            $cql[] = "subprecinct='$t'";
         }
         if (isset($terms['bed']) && $terms['bed']) {
             $t = urldecode($terms['bed']);

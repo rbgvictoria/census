@@ -84,12 +84,12 @@
                         <option value="1">Commemorative trees</option>
                         <option value="2">National Trust listed trees</option>
                     </select>
-                    <div id="collection-layers"></div>;
+                    <div id="collection-layers" class="layer-group"></div>
                     
                     <h4>Species</h4>
                     <input type="text" id="taxon-name" class="form-control"/>
                     <input type="hidden" id="taxon-id"/>
-                    <div id="species-layers"></div>
+                    <div id="species-layers" class="layer-group"></div>
                 </div>
               </div>
             </div>

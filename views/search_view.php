@@ -24,16 +24,19 @@
     <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">Family</div><div class="col-md-9 col-sm-8 col-xs-6"><?=urldecode($terms['family'])?></div></div>
     <?php endif; ?>
     <?php if (isset($terms['location'])): ?>
-    <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">Location</div><div class="col-md-9 col-sm-8 col-xs-6"><?=urldecode($terms['location'])?>%</div></div>
+    <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">Location</div><div class="col-md-9 col-sm-8 col-xs-6"><?=urldecode($terms['location'])?></div></div>
     <?php endif; ?>
     <?php if (isset($terms['precinct'])): ?>
-    <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">Precinct</div><div class="col-md-9 col-sm-8 col-xs-6"><?=urldecode($terms['precinct'])?>%</div></div>
+    <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">Precinct</div><div class="col-md-9 col-sm-8 col-xs-6"><?=urldecode($terms['precinct'])?></div></div>
+    <?php endif; ?>
+    <?php if (isset($terms['subprecinct'])): ?>
+    <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">Subprecinct</div><div class="col-md-9 col-sm-8 col-xs-6"><?=urldecode($terms['subprecinct'])?></div></div>
     <?php endif; ?>
     <?php if (isset($terms['bed'])): ?>
-    <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">Bed</div><div class="col-md-9 col-sm-8 col-xs-6"><?=urldecode($terms['bed'])?>%</div></div>
+    <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">Bed</div><div class="col-md-9 col-sm-8 col-xs-6"><?=urldecode($terms['bed'])?></div></div>
     <?php endif; ?>
     <?php if (isset($terms['grid'])): ?>
-    <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">Grid</div><div class="col-md-9 col-sm-8 col-xs-6"><?=$terms['grid']?>%</div></div>
+    <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">Grid</div><div class="col-md-9 col-sm-8 col-xs-6"><?=$terms['grid']?></div></div>
     <?php endif; ?>
     <?php if (isset($terms['wgs_code'])): ?>
     <div><div class="col-md-3 col-sm-4 col-xs-6 field-label">WGS region</div><div class="col-md-9 col-sm-8 col-xs-6"><?=$terms['wgs_code']?></div></div>

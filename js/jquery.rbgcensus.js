@@ -1,9 +1,9 @@
 var base_url = 'http://data.rbg.vic.gov.au/dev/rbgcensus';
 var query_string = location.href.substr(location.href.indexOf('?') + 1);
+var access_key = '';
 
 $(function() {
     setPopover();
-    var access_key = '';
     if ($('form:eq(0)').attr('data-restricted-access-key')) {
         access_key = $('form:eq(0)').attr('data-restricted-access-key');
     }
@@ -32,51 +32,24 @@ $(function() {
         minLength: 2
     });
     
+    bedFields();
+    subprecinctDropDown();
+    bedDropDown();
+    
     // get beds for Cranbourne or Melbourne
-    $('#search_precinct').parents('.form-group').eq(0).hide();
     $('#search_location').change(function() {
-        var location = $(this).val();
-        var url = base_url + '/ajax/bed';
-        $.ajax({
-            url: url,
-            data: {
-                location: location,
-                access_key: access_key
-            },
-            success: function(data) {
-                console.log(data);
-                var options = [];
-                options.push('<option value=""></option>');
-                $.each(data, function(index, item) {
-                    var option = '<option value="' + item + '">' + item + '</option>';
-                    options.push(option);
-                });
-                $('#search_bed').html(options.join(''));
-                
-                if (location === 'Cranbourne') {
-                    $('#search_grid').parents('.form-group').eq(0).hide();
-                    $('#search_precinct').parents('.form-group').eq(0).show();
-                }
-                else {
-                    $('#search_grid').parents('.form-group').eq(0).show();
-                    $('#search_precinct').parents('.form-group').eq(0).hide();
-                }
-            }
-        });
-
-        url = base_url + '/ajax/precinct';
-        $.ajax({
-            url: url + '?location=' + location,
-            success: function(data) {
-                var options = [];
-                options.push('<option value=""></option>');
-                $.each(data, function(index, item) {
-                    var option = '<option value="' + item + '">' + item + '</option>';
-                    options.push(option);
-                });
-                $('#search_precinct').html(options.join(''));
-            }
-        });
+        bedFields();
+        subprecinctDropDown();
+        bedDropDown();
+    });
+    
+    $('#search_precinct').change(function() {
+        subprecinctDropDown();
+        bedDropDown();
+    });
+    
+    $('#search_subprecinct').change(function() {
+        bedDropDown();
     });
     
     // Prevent 'restricted' checkbox from being changed
@@ -149,4 +122,83 @@ var setPopover = function() {
             }
         });
     });    
+};
+
+var bedFields = function() {
+    var location = $('#search_location').val();
+    if (location === 'Cranbourne') {
+        $('#search_grid').parents('.form-group').eq(0).hide();
+        $('#search_precinct').parents('.form-group').eq(0).show();
+        $('#search_subprecinct').parents('.form-group').eq(0).show();
+        $('#search_grid').val('');
+    }
+    else { 
+        if (location === 'Melbourne') {
+            $('#search_grid').parents('.form-group').eq(0).show();
+            $('#search_precinct').parents('.form-group').eq(0).hide();
+            $('#search_subprecinct').parents('.form-group').eq(0).hide();
+            $('#search_precinct').val('');
+            $('#search_subprecinct').val('');
+            
+        }
+        else {
+            $('#search_grid').parents('.form-group').eq(0).show();
+            $('#search_precinct').parents('.form-group').eq(0).show();
+            $('#search_subprecinct').parents('.form-group').eq(0).show();
+        }
+    }
+};
+
+var bedDropDown = function() {
+    var location = $('#search_location').val();
+    var precinct = $('#search_precinct').val();
+    var subprecinct = $('#search_subprecinct').val();
+    var url = base_url + '/ajax/bed';
+    $.ajax({
+        url: url,
+        data: {
+            location: location,
+            precinct: precinct,
+            subprecinct: subprecinct,
+            access_key: access_key
+        },
+        success: function(data) {
+            var options = [];
+            options.push('<option value=""></option>');
+            $.each(data, function(index, item) {
+                var option = '<option value="' + item + '">' + item + '</option>';
+                options.push(option);
+            });
+            $('#search_bed').html(options.join(''));
+            if (data.length === 1) {
+                $('#search_bed').val(data[0]);
+            }
+        }
+    });
+};
+
+var subprecinctDropDown = function() {
+    var location = $('#search_location').val();
+    var precinct = $('#search_precinct').val();
+    var url = base_url + '/ajax/subprecinct';
+    $.ajax({
+        url: url,
+        data: {
+            location: location,
+            precinct: precinct,
+            access_key: access_key
+        },
+        success: function(data) {
+            var options = [];
+            options.push('<option value=""></option>');
+            $.each(data, function(index, item) {
+                var option = '<option value="' + item + '">' + item + '</option>';
+                options.push(option);
+            });
+            $('#search_subprecinct').html(options.join(''));
+            if (data.length === 1) {
+                $('#search_subprecinct').val(data[0]);
+            }
+        }
+    });
 };

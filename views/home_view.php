@@ -47,6 +47,13 @@
 </div>
 
 <div class="form-group">
+    <?=form_label('Subprecinct', 'search_subprecinct', array('class' => 'col-md-2 control-label')); ?>
+    <div class="col-md-4">
+        <?=form_dropdown('subprecinct', array_merge(array('' => ''), $subprecincts), FALSE, 'id="search_subprecinct" class="form-control"');?>
+    </div>
+</div>
+
+<div class="form-group">
     <?=form_label('Bed', 'search_bed', array('class' => 'col-md-2 control-label')); ?>
     <div class="col-md-4">
         <?=form_dropdown('bed', array_merge(array('' => ''), $beds), FALSE, 'id="search_bed" class="form-control"');?>

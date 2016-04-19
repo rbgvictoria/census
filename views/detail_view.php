@@ -80,8 +80,10 @@
 <div class="row accession-info">
     <div class="term"><div class="col-md-2 field-label">Accession number</div><div class="col-md-4"><?=$accession_info['accession_number']?></div></div>
     <div class="term"><div class="col-md-2 field-label">Provenance type</div><div class="col-md-4"><?=$accession_info['provenance_type_code']?></div></div>
-    <div class="term"><div class="col-md-2 field-label">Provenance</div><div class="col-md-4"><?=$accession_info['provenance_history']?></div></div>
-    <div class="term"><div class="col-md-2 field-label">Collector</div><div class="col-md-4"><?=$accession_info['collector_name']?></div></div>
+    <?php if ($this->session->userdata('id')): ?>
+        <div class="term"><div class="col-md-2 field-label">Provenance</div><div class="col-md-4"><?=$accession_info['provenance_history']?></div></div>
+        <div class="term"><div class="col-md-2 field-label">Collector</div><div class="col-md-4"><?=$accession_info['collector_name']?></div></div>
+    <?php endif; ?>
     <div class="term"><div class="col-md-2 field-label">Identification status</div><div class="col-md-4"><?=$accession_info['identification_status']?>
         <?php 
             $substr = substr($accession_info['identification_status'],0,1);
@@ -106,8 +108,10 @@
 <div class="row accession-info">
     <div class="term"><div class="col-md-2 field-label">Accession_number</div><div class="col-md-4"><a href="<?=site_url()?>census/accession/<?=$plant_info['accession_guid']?>"><?=$plant_info['accession_number']?></a></div></div>
     <div class="term"><div class="col-md-2 field-label">Provenance type</div><div class="col-md-4"><?=$plant_info['provenance_type_code']?></div></div>
-    <div class="term"><div class="col-md-2 field-label">Provenance</div><div class="col-md-4"><?=$plant_info['provenance_history']?></div></div>
-    <div class="term"><div class="col-md-2 field-label">Collector</div><div class="col-md-4"><?=$plant_info['collector_name']?></div></div>
+    <?php if ($this->session->userdata('id')): ?>
+        <div class="term"><div class="col-md-2 field-label">Provenance</div><div class="col-md-4"><?=$plant_info['provenance_history']?></div></div>
+        <div class="term"><div class="col-md-2 field-label">Collector</div><div class="col-md-4"><?=$plant_info['collector_name']?></div></div>
+    <?php endif; ?>
     <div class="term"><div class="col-md-2 field-label">Identification status</div><div class="col-md-4"><?=$plant_info['identification_status']?>
         <?php 
             $substr = substr($plant_info['identification_status'],0,1);
@@ -137,7 +141,7 @@
     <div class="term"><div class="col-md-2 field-label">Precinct</div><div class="col-md-4"><?=$plant_info['precinct_name']?></div></div>
     <div class="term"><div class="col-md-2 field-label">Bed</div><div class="col-md-4"><a href="<?=site_url()?>census/bed/<?=$plant_info['bed_guid']?>"><?=$plant_info['bed_name']?></a></div></div>
     <div class="term"><div class="col-md-2 field-label">Grid</div><div class="col-md-4"><a href="<?=site_url()?>census/grid/<?=$plant_info['grid_guid']?>"><?=$plant_info['grid_code']?></a></div></div>
-    <div class="term"><div class="col-md-2 field-label">Date planted</div><div class="col-md-4"><?=$plant_info['date_planted']?></div></div>
+    <div class="term"><div class="col-md-2 field-label">Date planted</div><div class="col-md-4"><?=date('d/m/Y', strtotime($plant_info['date_planted']))?></div></div>
 </div>
 <?php if ($plant_info['location'] == 'Melbourne'  && $plant_info['grid_code']): ?>
 <div id="tabs" role="tabpanel">
@@ -232,7 +236,9 @@
                             <tr>
                                 <th>Plant number</th>
                                 <th>Bed</th>
+                                <?php if ($this->session->userdata('id')): ?>
                                 <th>Grid</th>
+                                <?php endif; ?>
                                 <th>Date planted</th>
                             </tr>
                         </thead>
@@ -248,10 +254,12 @@
                                     <?php endif; ?>
                                     <a href="<?=site_url()?>census/bed/<?=$plant['bed_guid']?>"><?=$plant['bed_name']?></a>
                                 </td>
+                                <?php if ($this->session->userdata('id')): ?>
                                 <td><a href="<?=site_url()?>census/grid/<?=$plant['grid_guid']?>">
                                     <?=$plant['grid_code']?>
                                     </a></td>
-                                <td><?=$plant['date_planted']?></td>
+                                <?php endif; ?>
+                                <td><?=date('d/m/Y', strtotime($plant['date_planted']))?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -340,12 +348,14 @@
                         <td><a href="<?=site_url()?>census/accession/<?=$plants[$index]['accession_guid']?>"><?=$plants[$index]['accession_number']?></a></td>
                         <td><a href="<?=site_url()?>census/plant/<?=$plants[$index]['plant_guid']?>"><?=$plants[$index]['plant_number']?></a></td>
                         <td class="text-center"><?=$plants[$index]['provenance_type_code']?></td>
-                        <td class="text-center"><?=$plants[$index]['identification_status']?></td>
                         <?php if ($this->session->userdata('id')): ?>
+                        <td class="text-center"><?=$plants[$index]['identification_status']?></td>
                         <td class="text-center"><input type="checkbox"<?=($plants[$index]['restricted']) ? ' checked="checked"' : '';?>/></td>
                         <td><a href="<?=site_url()?>census/grid/<?=$plants[$index]['grid_guid']?>"><?=$plants[$index]['grid_code']?></a></td>
+                        <?php else: ?>
+                        <td class="text-center"><?=substr($plants[$index]['identification_status'], 0, 1)?></td>
                         <?php endif; ?>
-                        <td><?=$plants[$index]['date_planted']?></td>
+                        <td><?=date('d/m/Y', strtotime($plants[$index]['date_planted']))?></td>
                     </tr>    
                 <?php endforeach; ?>
                 </tbody>
@@ -534,11 +544,12 @@
                         <td><a href="<?=site_url()?>census/accession/<?=$plants[$index]['accession_guid']?>"><?=$plants[$index]['accession_number']?></a></td>
                         <td><a href="<?=site_url()?>census/plant/<?=$plants[$index]['plant_guid']?>"><?=$plants[$index]['plant_number']?></a></td>
                         <td class="text-center"><?=$plants[$index]['provenance_type_code']?></td>
-                        <td class="text-center"><?=$plants[$index]['identification_status']?></td>
-                        
                         <?php if ($this->session->userdata('id')): ?>
+                        <td class="text-center"><?=$plants[$index]['identification_status']?></td>
                         <td class="text-center"><input type="checkbox"<?=($plants[$index]['restricted']) ? ' checked="checked"' : '';?>/></td>
                         <td><a href="<?=site_url()?>census/grid/<?=$plants[$index]['grid_guid']?>"><?=$plants[$index]['grid_code']?></a></td>
+                        <?php else: ?>
+                        <td class="text-center"><?=substr($plants[$index]['identification_status'], 0, 1)?></td>
                         <?php endif; ?>
                     </tr>    
                 <?php endforeach; ?>

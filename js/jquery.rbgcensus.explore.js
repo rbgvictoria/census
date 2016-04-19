@@ -144,6 +144,7 @@ var initMap = function() {
 
     map = new ol.Map({
       target: 'map',
+      interactions : ol.interaction.defaults({doubleClickZoom :false}),
       controls: ol.control.defaults().extend([mousePositionControl]),
       layers: [rbgBase, rbgMap],
       view: view
@@ -228,10 +229,6 @@ var getCollectionLayer = function(collection) {
         }
     });
     
-    var r = Math.round(Math.random()*255);
-    var g = Math.round(Math.random()*255);
-    var b = Math.round(Math.random()*255);
-    
     var layerProps = {
         1: {
             "icon" : "tree-icons/yellow_40/tree65_yellow_40.png",
@@ -269,9 +266,11 @@ var getCollectionLayer = function(collection) {
     
     $('<div>', {
         'class': 'list-group-item checkbox',
-        'html' : '<label><input type="checkbox" data-collection-layer-index="' + i + '" checked="checked"/>' + 
+        'html' : '<label><input type="checkbox" data-layer-index="' + i + '" checked="checked"/>' + 
                 '<img src="img/' + layerProps[collection].icon + '" alt="" height="20" width="20"/> ' +
-                layerProps[collection].name + ' <span class="delete-layer"><i class="fa fa-trash-o"></i></span></l abel>',
+                layerProps[collection].name + '</label>' +
+                '<span class="attribute-table" data-toggle="modal" data-target="#attributeTableModal"><i class="fa fa-table"></i></span>' +
+                ' <span class="delete-layer"><i class="fa fa-trash-o"></i></span>',
         'data-collection-id': collection
     }).prependTo('#collection-layers');
 };
@@ -376,7 +375,7 @@ var getSpeciesLayer = function(guid) {
 
     $('<div>', {
         'class': 'list-group-item checkbox',
-        'html' : '<label><input type="checkbox" data-species-layer-index="' + i + '" checked="checked"/>' + 
+        'html' : '<label><input type="checkbox" data-layer-index="' + i + '" checked="checked"/>' + 
                 '<span class="icon">' + circle + '</span> ' + 
                 $('#taxon-name').val() + '</label>' +  
                 '<span class="attribute-table" data-toggle="modal" data-target="#attributeTableModal"><i class="fa fa-table"></i></span>' + 
@@ -461,11 +460,11 @@ var attributeTableModal = function() {
     $('#attributeTableModal').on('show.bs.modal', function (event) {
         var target = $(event.relatedTarget);
         var taxonID = target.parents('div').eq(0).data('taxon-id');
-        var taxonName = target.parents('div').eq(0).children('label').text();
-        var index = target.parents('div').eq(0).find(':checkbox').eq(0).data('species-layer-index');
+        var layerName = target.parents('div').eq(0).children('label').text();
+        var index = target.parents('div').eq(0).find(':checkbox').eq(0).data('layer-index');
         
         modal = $(this);
-        modal.find('.layer-title').text(taxonName);
+        modal.find('.layer-title').text(layerName);
         
         var thead = heredoc(function() {/*
             <tr>
@@ -477,7 +476,13 @@ var attributeTableModal = function() {
         modal.find('thead').html(thead);
         modal.find('tbody').html('');
         
-        var features = speciesLayers[index].getSource().getFeatures();
+        var layerGroup = target.parents('.layer-group').eq(0).attr('id');
+        if (layerGroup === 'species-layers') {
+            var features = speciesLayers[index].getSource().getFeatures();
+        }
+        else {
+            var features = collectionLayers[index].getSource().getFeatures();
+        }
         $.each(features, function(index, feature) {
             var props = feature.getProperties();
             var tr = $('<tr/>').appendTo(modal.find('tbody'));
@@ -560,6 +565,8 @@ var featureInfoModal = function() {
             html: '<div><a href="http://data.rbg.vic.gov.au/rbgcensus/census/bed/' + props.bed_id + '" target="_blank"><i>' + props.bed_name + '</i></a></div>'
         }).appendTo(modal.find('.feature-info'));
         
+        $('<div/>', {html: '&nbsp;'}).appendTo(modal.find('.feature-info'));
+        
         if (props.attributes !== undefined) {
             var labels = {
                 "commemorative": "Commemorative",
@@ -594,98 +601,97 @@ var mapInteraction = function() {
     map.on('click', function(evt) {
         if (!$('.popover:hover').length) {
             $('.popup').popover('hide');
-        }
         
-        var element = document.createElement('div');
-        $(element).addClass('popup');
+            var element = document.createElement('div');
+            $(element).addClass('popup');
 
-        var popup = new ol.Overlay({
-          element: element,
-          positioning: 'bottom-center',
-          stopEvent: false,
-        });
-        map.addOverlay(popup);
-        
-        var features = [];
-        map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
-            feature.setProperties({
-                "layerProperties": layer.getProperties()
+            var popup = new ol.Overlay({
+              element: element,
+              positioning: 'bottom-center',
+              stopEvent: false,
             });
-            features.push(feature);
-        });
-        
-        if (features.length) {
-            var content = infoWindowContent(features);
-            
-            if (!$('.popover:hover').length) {
-                var template = heredoc(function() {/*
-                    <div class="popover" role="tooltip">
-                        <div class="arrow"></div>
-                        <h3 class="popover-title"></h3>
-                        <div class="popover-content"></div>
-                        <div class="popover-footer"></div>
-                    </div>                 
-                */});
-                
-                popup.setPosition(evt.coordinate);
-                $(element).popover({
-                  placement: 'top',
-                  title: '<div class="text-right"><span class="close">&times;</span></div>',
-                  html: true,
-                  content: content,
-                  template: template
+            map.addOverlay(popup);
+
+            var features = [];
+            map.forEachFeatureAtPixel(evt.pixel, function(feature, layer) {
+                feature.setProperties({
+                    "layerProperties": layer.getProperties()
                 });
-                $(element).popover('show');
-                if (features.length > 1) {
-                    console.log('Hello');
-                    $('.popup').on('shown.bs.popover', function() {
-                        $('<div/>', {
-                            class: "feature-nav row"
-                        }).appendTo('.popover-footer');
-                        $('<div/>', {
-                            class: "col-sm-6",
-                            html: '1 of ' + features.length
-                        }).appendTo('.feature-nav');
-                        $('<div/>', {
-                            class: "col-sm-6 text-right"
-                        }).append('<button class="prev btn btn-default btn-sm" disabled="disabled"><i class="fa fa-chevron-left"></i> prev</span></button>')
-                                .append('<button class="next btn btn-default btn-sm">next <i class="fa fa-chevron-right"></i></button>').appendTo('.feature-nav');
-                    });
-                }
-                
-                autoPan(evt.coordinate);
-            }
+                features.push(feature);
+            });
 
-            $('.popover').on('click', 'button', function() {
-                var height = $('.features').eq(0).height();
-                var index = $('.popover .feature').index($('.popover .feature').not(':hidden'));
-                var newIndex;
-                if ($(this).hasClass('prev')) {
-                    newIndex = index - 1;
+            if (features.length) {
+                var content = infoWindowContent(features);
+
+                if (!$('.popover:hover').length) {
+                    var template = heredoc(function() {/*
+                        <div class="popover" role="tooltip">
+                            <div class="arrow"></div>
+                            <h3 class="popover-title"></h3>
+                            <div class="popover-content"></div>
+                            <div class="popover-footer"></div>
+                        </div>                 
+                    */});
+
+                    popup.setPosition(evt.coordinate);
+                    $(element).popover({
+                      placement: 'top',
+                      title: '<div class="text-right"><span class="close">&times;</span></div>',
+                      html: true,
+                      content: content,
+                      template: template
+                    });
+                    $(element).popover('show');
+                    
+                    if (features.length > 1) {
+                        $('.popup').on('shown.bs.popover', function() {
+                            $('<div/>', {
+                                class: "feature-nav row"
+                            }).appendTo('.popover-footer');
+                            $('<div/>', {
+                                class: "col-sm-6",
+                                html: '1 of ' + features.length
+                            }).appendTo('.feature-nav');
+                            $('<div/>', {
+                                class: "col-sm-6 text-right"
+                            }).append('<button class="prev btn btn-default btn-sm" disabled="disabled"><i class="fa fa-chevron-left"></i> prev</span></button>')
+                                    .append('<button class="next btn btn-default btn-sm">next <i class="fa fa-chevron-right"></i></button>').appendTo('.feature-nav');
+                        });
+                    }
+
+                    autoPan(evt.coordinate);
                 }
-                else {
-                    newIndex = index + 1;
-                }
-                $(this).parents('.popover').eq(0).find('.feature').hide();
-                $(this).parents('.popover').eq(0).find('.feature').eq(newIndex).show();
-                $(this).parents('.feature-nav').eq(0).children('div').eq(0).html((newIndex + 1) + ' of ' + features.length);
-                $('.features').css('height', height + 'px');
-                $('.prev').removeAttr('disabled');
-                $('.next').removeAttr('disabled');
-                if (newIndex === 0) {
-                    $('.prev').attr('disabled', 'disabled');
-                }
-                if (newIndex === features.length - 1) {
-                    $('.next').attr('disabled', 'disabled');
-                }
-            });
-            
-            $('.popover .close').click(function() {
-                $('.popover').popover('hide');
-            });
+            }
         }
     });
-    
+
+    $('#map').on('click', '.popover button', function() {
+        var features = $(this).parents('.popover').eq(0).find('.feature');
+        var height = $('.features').eq(0).height();
+        var index = $('.popover .feature').index($('.popover .feature').not(':hidden'));
+        var newIndex;
+        if ($(this).hasClass('prev')) {
+            newIndex = index - 1;
+        }
+        else {
+            newIndex = index + 1;
+        }
+        $(this).parents('.popover').eq(0).find('.feature').hide();
+        $(this).parents('.popover').eq(0).find('.feature').eq(newIndex).show();
+        $(this).parents('.feature-nav').eq(0).children('div').eq(0).html((newIndex + 1) + ' of ' + features.length);
+        $('.prev').removeAttr('disabled');
+        $('.next').removeAttr('disabled');
+        if (newIndex === 0) {
+            $('.prev').attr('disabled', 'disabled');
+        }
+        if (newIndex === features.length - 1) {
+            $('.next').attr('disabled', 'disabled');
+        }
+    });
+
+    $('#map').on('click', '.popover .close', function() {
+        $('.popover').popover('hide');
+    });
 };
 
 var infoWindowContent = function(features) {

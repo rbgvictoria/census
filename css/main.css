@@ -361,6 +361,12 @@ td.table_bed_header .all a {
     color: #999;
 }
 
-.last-updated {
-    margin-top: 31px;
+/* footer
+********************************************/
+.cc {
+    float: right;
+    display: block;
+    margin-left: 10px;
+    margin-top: 4px;
 }
+

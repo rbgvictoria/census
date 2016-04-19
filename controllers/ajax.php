@@ -11,7 +11,14 @@ class Ajax extends CI_Controller {
     }
     
     function bed() {
-        $data = $this->censusmodel->getBedsJSON($this->input->get('location'), $this->input->get('access_key'));
+        $data = $this->censusmodel->getBedsJSON($this->input->get('location'), $this->input->get('precinct'), $this->input->get('subprecinct'), $this->input->get('access_key'));
+        $json = json_encode($data);
+        header('Content-type: application/json');
+        echo $json;
+    }
+
+    function subprecinct() {
+        $data = $this->censusmodel->getSubprecinctsJSON($this->input->get('location'), $this->input->get('precinct'), $this->input->get('access_key'));
         $json = json_encode($data);
         header('Content-type: application/json');
         echo $json;

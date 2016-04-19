@@ -34,7 +34,7 @@ class CensusModel extends CI_Model {
         return $ret;
     }
     
-    public function getBedsJSON($location=FALSE, $access_key=FALSE) {
+    public function getBedsJSON($location=FALSE, $precinct=FALSE, $subprecinct=FALSE, $access_key=FALSE) {
         $this->db->select("b.guid, CASE WHEN b.location='Cranbourne' AND b.bed_type='bed' 
             THEN pb.bed_name || ': ' || b.bed_name ELSE b.bed_name END AS bed_name", FALSE);
         $this->db->from('rbgcensus.bed b');
@@ -45,14 +45,44 @@ class CensusModel extends CI_Model {
         }
         if ($location) {
             $this->db->where('b.location', $location);
+            if ($location == 'Cranbourne' && $precinct) {
+                $this->db->where('b.precinct_name', $precinct);
+            }
+            if ($location == 'Cranbourne' && $subprecinct) {
+                $this->db->where('b.subprecinct_name', $subprecinct);
+            }
         }
         $this->db->group_by('b.bed_id');
         $this->db->group_by('pb.bed_id');
         $this->db->order_by('bed_name');
         $query = $this->db->get();
         $ret = array();
-        foreach ($query->result() as $row)
+        foreach ($query->result() as $row) {
             $ret[] = $row->bed_name;
+        }
+        return $ret;
+    }
+    
+    public function getSubprecinctsJSON($location=FALSE, $precinct=FALSE, $access_key=FALSE) {
+        $this->db->select('b.subprecinct_name');
+        $this->db->from('rbgcensus.bed b');
+        $this->db->join('rbgcensus.plant p', 'b.bed_id=p.bed_id');
+        if (!$this->session->userdata('id') && !$access_key) {
+            $this->db->where('b.is_restricted !=', -1);
+        }
+        if ($location) {
+            $this->db->where('b.location', $location);
+        }
+        if ($precinct) {
+            $this->db->where('b.precinct_name', $precinct);
+        }
+        $this->db->group_by('b.subprecinct_name');
+        $this->db->order_by('b.subprecinct_name');
+        $query = $this->db->get();
+        $ret = array();
+        foreach ($query->result() as $row) {
+            $ret[] = $row->subprecinct_name;
+        }
         return $ret;
     }
     
@@ -69,6 +99,23 @@ class CensusModel extends CI_Model {
         $ret = array();
         foreach ($query->result() as $row)
             $ret[$row->precinct_name] = $row->precinct_name;
+        return $ret;
+    }
+
+    public function getSubprecincts($location=FALSE) {
+        $this->db->select('b.subprecinct_name');
+        $this->db->from('rbgcensus.bed b');
+        $this->db->join('rbgcensus.plant p', 'b.bed_id=p.bed_id');
+        if ($location) {
+            $this->db->where('b.location', $location);
+        }
+        $this->db->group_by('b.subprecinct_name');
+        $this->db->order_by('b.subprecinct_name');
+        $query = $this->db->get();
+        $ret = array();
+        foreach ($query->result() as $row) {
+            $ret[$row->subprecinct_name] = $row->subprecinct_name;
+        }
         return $ret;
     }
 
@@ -178,14 +225,29 @@ class CensusModel extends CI_Model {
                     $this->db->where('g.code', $value);
                 if ($key == 'grid_guid')
                     $this->db->where('g.guid', $value);
-                if ($key == 'location')
+                if ($key == 'location') {
                     $this->db->where('b.location', $value);
-                if ($key == 'precinct')
-                    $this->db->where('b.precinct_name', $value);
-                if ($key == 'bed')
-                    $this->db->where('b.bed_name', $value);
-                if ($key == 'bed_guid')
+                }
+                if ($key == 'precinct') {
+                    $this->db->where("b.precinct_name", $value);
+                }
+                if ($key == 'subprecinct') {
+                    $this->db->where("b.subprecinct_name", $value);
+                }
+                if ($key == 'bed') {
+                    if (strpos($value, ':') !== FALSE) {
+                        $subprecinct = substr($value, 0, strpos($value, ':'));
+                        $bed = substr($value, strpos($value, ':')+2);
+                        $this->db->where('b.subprecinct_name', $subprecinct);
+                        $this->db->where('b.bed_name', $bed);
+                    }
+                    else {
+                        $this->db->where('b.bed_name', $value);
+                    }
+                }
+                if ($key == 'bed_guid') {
                     $this->db->where('b.guid', $value);
+                }
                 if ($key == 'wgs_code') {
                     $this->db->join('rbgcensus.taxon_area ta', 't.taxon_id=ta.taxon_id');
                     $this->db->join('wgs.wgs_region r', 'ta.area_id=r.region_id');
@@ -273,16 +335,26 @@ class CensusModel extends CI_Model {
     public function findPlantsDownload($where, $inclDeaccessioned=FALSE) {
         $this->searchBaseQuery($where, $inclDeaccessioned);
         $this->db->select('a.accession_number as "accessionNumber", p.plant_number as "plantNumber", 
-            c.family, t.taxon_name as "scientificName", t.common_name as "vernacularName", 
-            a.identification_status as "identificationVerificationStatus", 
-            b.location as locality, b.bed_name as bed, g.code as grid, 
-            a.provenance_type_code as "provenanceTypeCode", p.date_planted as "datePlanted"');
+            c.family, t.taxon_name as "scientificName", t.common_name as "vernacularName"');
+        if ($this->session->userdata('id')) {
+            $this->db->select('a.identification_status as "identificationVerificationStatus"');
+        }
+        else {
+            $this->db->select('substring(a.identification_status from 1 for 1) as "identificationVerificationStatus"', FALSE);
+        }
+        $this->db->select('b.location as locality, b.bed_name as bed');
+        if ($this->session->userdata('id')) {
+            $this->db->select('g.code as grid');
+        }
+        $this->db->select('a.provenance_type_code as "provenanceTypeCode", p.date_planted as "datePlanted"');
         if ($this->session->userdata('id')) {
             $this->db->select('CASE WHEN b.is_restricted=-1 THEN 1 WHEN t.no_public_display=1 THEN 1 ELSE 0 END AS restricted', FALSE);
+            if ($inclDeaccessioned) {
+                $this->db->select('CASE WHEN d.deaccession_id IS NOT NULL THEN 1 ELSE 0 END AS deaccessioned', FALSE);
+            }
         }
-        if ($inclDeaccessioned) {
-            $this->db->select('CASE WHEN d.deaccession_id IS NOT NULL THEN 1 ELSE 0 END AS deaccessioned', FALSE);
-        }
+        $this->db->select("'Royal Botanic Gardens Victoria' as \"rightsHolder\"", FALSE);
+        $this->db->select("'http://creativecommons.org/licenses/by-nc-nd/4.0/' as license", FALSE);
         foreach ($where as $key) {
             if ($key == 'wgs_code') {
                 $this->db->group_by('t.taxon_id, a.accession_id, p.plant_id, b.bed_id, g.grid_id');
@@ -306,6 +378,8 @@ class CensusModel extends CI_Model {
         /*if ($inclDeaccessioned) {
             $this->db->select('CASE WHEN d.deaccession_id IS NOT NULL THEN 1 ELSE 0 END AS deaccessioned', FALSE);
         }*/
+        $this->db->select("'Royal Botanic Gardens Victoria' as \"rightsHolder\"", FALSE);
+        $this->db->select("'http://creativecommons.org/licenses/by-nc-nd/4.0/' as license", FALSE);
         foreach ($where as $key) {
             if ($key == 'wgs_code') {
                 $this->db->group_by('t.taxon_id, a.accession_id, p.plant_id, b.bed_id, g.grid_id');
