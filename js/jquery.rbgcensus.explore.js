@@ -182,7 +182,6 @@ var initMap = function() {
 
 var toggleBaseMap = function(rbgBase, rbgMap) {
     $('#base-map-toggle').on('click', '.btn', function(e) {
-        console.log('Hello');
         if (!$(e.target).hasClass('active')) {
             if ($(e.target).children('input').eq(0).attr('id') === 'base-map-map') {
                 rbgMap.setVisible(true);

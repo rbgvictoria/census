@@ -141,7 +141,7 @@
     <div class="term"><div class="col-md-2 field-label">Precinct</div><div class="col-md-4"><?=$plant_info['precinct_name']?></div></div>
     <div class="term"><div class="col-md-2 field-label">Bed</div><div class="col-md-4"><a href="<?=site_url()?>census/bed/<?=$plant_info['bed_guid']?>"><?=$plant_info['bed_name']?></a></div></div>
     <div class="term"><div class="col-md-2 field-label">Grid</div><div class="col-md-4"><a href="<?=site_url()?>census/grid/<?=$plant_info['grid_guid']?>"><?=$plant_info['grid_code']?></a></div></div>
-    <div class="term"><div class="col-md-2 field-label">Date planted</div><div class="col-md-4"><?=date('d/m/Y', strtotime($plant_info['date_planted']))?></div></div>
+    <div class="term"><div class="col-md-2 field-label">Date planted</div><div class="col-md-4"><?=$plant_info['date_planted'] ? date('d/m/Y', strtotime($plant_info['date_planted'])) : '';?></div></div>
 </div>
 <?php if ($plant_info['location'] == 'Melbourne'  && $plant_info['grid_code']): ?>
 <div id="tabs" role="tabpanel">
@@ -259,7 +259,7 @@
                                     <?=$plant['grid_code']?>
                                     </a></td>
                                 <?php endif; ?>
-                                <td><?=date('d/m/Y', strtotime($plant['date_planted']))?></td>
+                                <td><?=$plant['date_planted'] ? date('d/m/Y', strtotime($plant['date_planted'])) : ''?></td>
                             </tr>
                             <?php endforeach; ?>
                         </tbody>
@@ -355,7 +355,7 @@
                         <?php else: ?>
                         <td class="text-center"><?=substr($plants[$index]['identification_status'], 0, 1)?></td>
                         <?php endif; ?>
-                        <td><?=date('d/m/Y', strtotime($plants[$index]['date_planted']))?></td>
+                        <td><?=$plants[$index]['date_planted'] ? date('d/m/Y', strtotime($plants[$index]['date_planted'])) : '';?></td>
                     </tr>    
                 <?php endforeach; ?>
                 </tbody>

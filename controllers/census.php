@@ -421,6 +421,7 @@ class Census extends CI_Controller {
         $order = 'taxon_name';
         if (isset($terms['order_results']) && $terms['order_results']) {
             $order = $terms['order_results'];
+            $qstring[] = 'order_results=' . $terms['order_results'];
         }
         return (object) array(
             'where' => $where,

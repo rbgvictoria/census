@@ -220,7 +220,7 @@ class CensusModel extends CI_Model {
                 if ($key == 'common_name')
                     $this->db->where("lower(t.common_name) LIKE '" . strtolower($value) . "'", FALSE, FALSE);
                 if ($key == 'family')
-                    $this->db->where('lower(c.family)', strtolower($value), FALSE);
+                    $this->db->where('lower(c.family)', "'" . strtolower($value) . "'", FALSE);
                 if ($key == 'grid')
                     $this->db->where('g.code', $value);
                 if ($key == 'grid_guid')

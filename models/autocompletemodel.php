@@ -88,7 +88,7 @@ class AutoCompleteModel extends CI_Model {
         return $query->result();
     }
 
-    public function getFamilies($q, $inclDeaccessioned=FALSE) {
+    public function getFamilies($q, $inclDeaccessioned=FALSE, $access_key=FALSE) {
         $this->db->select('c.family');
         $this->db->from('rbgcensus.taxon t');
         $this->db->join('rbgcensus.classification c', 't.genus_id=c.genus_id');
